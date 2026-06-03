@@ -3,13 +3,12 @@
  * Premium Author Platform · Complete Interaction Engine
  * =========================================================
  * Modules:
- *  1. ThemeEngine      — dark/light with localStorage
- *  2. NavEngine        — scroll effects, spy, mobile drawer
- *  3. GalleryEngine    — swipe + drag gallery with captions
- *  4. QuotesEngine     — book excerpt carousel
- *  5. ReviewEngine     — swipeable review carousel + CRUD
- *  6. ContactEngine    — EmailJS / FormSubmit delivery
- *  7. UtilEngine       — scroll reveals, back-to-top, footer year
+ *  1. NavEngine        — scroll effects, spy, mobile drawer
+ *  2. GalleryEngine    — swipe + drag gallery with captions
+ *  3. QuotesEngine     — book excerpt carousel
+ *  4. ReviewEngine     — swipeable review carousel + CRUD
+ *  5. ContactEngine    — EmailJS / FormSubmit delivery
+ *  6. UtilEngine       — scroll reveals, back-to-top, footer year
  */
 
 'use strict';
@@ -17,44 +16,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
 /* ============================================================
-   1. THEME ENGINE
-   ============================================================ */
-const ThemeEngine = (() => {
-  const html   = document.documentElement;
-  const btn    = document.getElementById('theme-toggle');
-  const icon   = btn ? btn.querySelector('i') : null;
-  const KEY    = 'frd-theme';
-
-  const apply = (theme) => {
-    html.setAttribute('data-theme', theme);
-    localStorage.setItem(KEY, theme);
-    if (icon) {
-      icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    }
-    if (btn) btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-  };
-
-  const init = () => {
-    const saved  = localStorage.getItem(KEY);
-    const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    apply(saved || system);
-
-    if (btn) {
-      btn.addEventListener('click', () => {
-        apply(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-      });
-    }
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-      if (!localStorage.getItem(KEY)) apply(e.matches ? 'dark' : 'light');
-    });
-  };
-
-  return { init };
-})();
-
-/* ============================================================
-   2. NAV ENGINE
+   1. NAV ENGINE
    ============================================================ */
 const NavEngine = (() => {
   const nav        = document.getElementById('main-nav');
@@ -414,47 +376,7 @@ const QuotesEngine = (() => {
    ============================================================ */
 const ReviewEngine = (() => {
 
-  /* ── Seed reviews ───────────────────────────────────────── */
-  const SEED = [
-    {
-      name: 'Dr. Priya Menon',
-      role: 'Community Leader',
-      text: 'A breathtaking journey from five rupees to a life of extraordinary purpose. Francis\'s story dismantles every excuse we have for not chasing our dreams.',
-      date: '12 Jan 2026'
-    },
-    {
-      name: 'Reverend James Okafor',
-      role: 'Chaplaincy Advocate',
-      text: 'Profoundly moving. This biography transcends the memoir genre entirely — it becomes a spiritual companion for anyone navigating hardship.',
-      date: '3 Feb 2026'
-    },
-    {
-      name: 'Lena Hoffmann',
-      role: 'International Reader',
-      text: 'I could not put it down. Francis writes with such raw honesty and warmth. Every page felt like a letter written directly to me.',
-      date: '19 Feb 2026'
-    },
-    {
-      name: 'Samuel Krishnaswamy',
-      role: 'Ministry Partner',
-      text: 'The Five Rupees Dreams is not just a book — it is a blueprint for purposeful living. I recommend it to every leader I know.',
-      date: '4 Mar 2026'
-    },
-    {
-      name: 'Anika Rosen',
-      role: 'Book Club Organiser',
-      text: 'Our book club had the most vibrant discussion about this book. It sparked conversations about faith, poverty, and what it truly means to succeed.',
-      date: '28 Mar 2026'
-    },
-    {
-      name: 'Pastor David Osei',
-      role: 'Ghanaian Ministry Leader',
-      text: 'Francis\'s humility shines through every chapter. A story of God\'s faithfulness told through one man\'s incredible journey across continents.',
-      date: '11 Apr 2026'
-    }
-  ];
-
-  const STORAGE_KEY = 'frd-reviews-v5';
+  const STORAGE_KEY = 'frd-reviews-v6'; /* bumped from v5 — clears seeded data */
 
   /* ── DOM refs ───────────────────────────────────────────── */
   const track      = document.getElementById('reviews-track');
@@ -485,12 +407,9 @@ const ReviewEngine = (() => {
   const load = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      reviews = raw ? JSON.parse(raw) : null;
-      if (!Array.isArray(reviews) || reviews.length === 0) {
-        reviews = SEED.map(r => ({ ...r }));
-        save();
-      }
-    } catch (_) { reviews = SEED.map(r => ({ ...r })); }
+      reviews = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(reviews)) reviews = [];
+    } catch (_) { reviews = []; }
   };
 
   const save = () => {
@@ -503,8 +422,8 @@ const ReviewEngine = (() => {
   );
 
   /* ── Page count ─────────────────────────────────────────── */
-  const perPage  = () => window.innerWidth < 640 ? 1 : 2;
-  const pages    = () => Math.ceil(reviews.length / perPage());
+  const perPage  = () => window.innerWidth <= 768 ? 1 : 2;
+  const pages    = () => Math.max(1, Math.ceil(reviews.length / perPage()));
 
   /* ── Build track ────────────────────────────────────────── */
   const render = () => {
@@ -512,6 +431,33 @@ const ReviewEngine = (() => {
     const pp    = perPage();
     const total = pages();
     track.innerHTML = '';
+
+    /* Empty state */
+    if (reviews.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'review-card';
+      empty.setAttribute('role', 'group');
+      empty.innerHTML = `
+        <div class="review-node review-empty-state" style="text-align:center;padding:2.5rem 1.5rem;grid-column:1/-1;">
+          <div style="font-size:2.5rem;margin-bottom:1rem;opacity:0.3;">✦</div>
+          <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.6;">No reviews yet. Be the first to share your experience with this book.</p>
+        </div>`;
+      track.appendChild(empty);
+      if (curEl) curEl.textContent = '0';
+      if (totEl) totEl.textContent = '0';
+      if (dotsWrap) dotsWrap.innerHTML = '';
+      const counterEl = document.getElementById('reviews-counter');
+      if (counterEl) counterEl.style.visibility = 'hidden';
+      const navEl = document.querySelector('.reviews-nav');
+      if (navEl) { navEl.querySelector('#reviews-prev').style.visibility = 'hidden'; navEl.querySelector('#reviews-next').style.visibility = 'hidden'; }
+      return;
+    }
+
+    /* Restore nav visibility */
+    const counterEl = document.getElementById('reviews-counter');
+    if (counterEl) counterEl.style.visibility = '';
+    if (prevBtn) prevBtn.style.visibility = '';
+    if (nextBtn) nextBtn.style.visibility = '';
 
     for (let p = 0; p < total; p++) {
       const page = document.createElement('div');
@@ -940,7 +886,6 @@ const UtilEngine = (() => {
 /* ============================================================
    BOOTSTRAP ALL MODULES
    ============================================================ */
-ThemeEngine.init();
 NavEngine.init();
 GalleryEngine.init();
 QuotesEngine.init();

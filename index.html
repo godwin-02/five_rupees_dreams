@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -44,9 +44,6 @@
                 </a>
 
                 <div class="nav-right">
-                    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-                        <i class="fas fa-moon" aria-hidden="true"></i>
-                    </button>
                     <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu" aria-controls="nav-drawer">
                         <span class="hamburger-bar"></span>
                         <span class="hamburger-bar"></span>
@@ -57,11 +54,13 @@
                 <div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="false" aria-label="Navigation menu">
                     <ul class="nav-links" role="list">
                         <li role="listitem"><a href="#hero">Home</a></li>
-                        <li role="listitem"><a href="#author">Author</a></li>
+                        
                         <li role="listitem"><a href="#book">Book</a></li>
+                        <li role="listitem"><a href="#author">Author</a></li>
+                        
+                        <li role="listitem"><a href="#publisher">Publisher</a></li>
                         <li role="listitem"><a href="#gallery">Gallery</a></li>
                         <li role="listitem"><a href="#reviews">Reviews</a></li>
-                        <li role="listitem"><a href="#publisher">Publisher</a></li>
                         <li role="listitem"><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -79,7 +78,7 @@
             <div class="hero-ambient" aria-hidden="true"></div>
             <div class="container hero-container">
                 <div class="hero-content">
-                    <span class="hero-tagline" aria-label="Genre: Bestselling Biography">Bestselling Biography</span>
+                    <span class="hero-tagline" aria-label="Genre: Bestselling Biography">Bestselling Inspirational Memoir</span>
                     <h1 class="hero-title" id="hero-title">THE FIVE<br>RUPEES DREAMS</h1>
                     <p class="hero-subtitle">From five rupees to a life of meaning.</p>
                     <blockquote class="hero-quote">
@@ -108,44 +107,6 @@
             </a>
         </section>
 
-        <!-- ================================================================
-             AUTHOR SECTION
-        ================================================================ -->
-        <section id="author" class="author-section section-pad" aria-labelledby="author-heading" data-reveal>
-            <div class="container">
-                <div class="editorial-split">
-                    <div class="editorial-image-col">
-                        <div class="portrait-frame">
-                            <img src="./images/author.jpeg" alt="Francis Soundararajan, Author & Chaplain" class="portrait-img" loading="lazy" width="400" height="500">
-                            <div class="portrait-accent" aria-hidden="true"></div>
-                        </div>
-                    </div>
-                    <div class="editorial-text-col">
-                        <span class="eyebrow">The Author</span>
-                        <h2 class="section-title" id="author-heading">Francis Soundararajan</h2>
-                        <p class="lead-italic">Author &amp; Chaplain</p>
-                        <div class="body-text">
-                            <p>Francis Soundararajan stands as a beacon of transformational leadership, charting a singular path from highly localized grassroots realities to modern global humanitarian frameworks. His life's work represents a profound synchronization of structural ministry, institutional building, and narrative-driven empathy.</p>
-                            <p>Ordained as a Chaplain and celebrated across international communities, Francis brings a unique fusion of grassroots wisdom and global perspective — channeled through his deeply personal biography.</p>
-                        </div>
-                        <div class="author-stats" aria-label="Author highlights">
-                            <div class="stat-pill">
-                                <span class="stat-num">30+</span>
-                                <span class="stat-label">Years Ministry</span>
-                            </div>
-                            <div class="stat-pill">
-                                <span class="stat-num">3</span>
-                                <span class="stat-label">Continents</span>
-                            </div>
-                            <div class="stat-pill">
-                                <span class="stat-num">1</span>
-                                <span class="stat-label">Transformational Book</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- ================================================================
              BOOK SECTION
@@ -198,6 +159,84 @@
                 </div>
             </div>
         </section>
+        
+        <!-- ================================================================
+             AUTHOR SECTION
+        ================================================================ -->
+        <section id="author" class="author-section section-pad" aria-labelledby="author-heading" data-reveal>
+            <div class="container">
+                <div class="editorial-split">
+                    <div class="editorial-image-col">
+                        <div class="portrait-frame">
+                            <img src="./images/author.jpeg" alt="Francis Soundararajan, Author & Chaplain" class="portrait-img" loading="lazy" width="400" height="500">
+                            <div class="portrait-accent" aria-hidden="true"></div>
+                        </div>
+                    </div>
+                    <div class="editorial-text-col">
+                        <span class="eyebrow">The Author</span>
+                        <h2 class="section-title" id="author-heading">Francis Soundararajan</h2>
+                        <p class="lead-italic">Author &amp; Chaplain</p>
+                        <div class="body-text">
+                            <p>Francis Soundararajan is a professional chaplain and clinical spiritual care practitioner with a background in pastoral ministry, education, and healthcare chaplaincy. He brings a cross-cultural perspective shaped by service in India and the United States.
+He completed multiple Clinical Pastoral Education (CPE) units, including a residency at Vanderbilt University Medical Center, where he served in ICU, pediatrics, mental health, and palliative care. His work centers on compassionate presence, meaning-making, and holistic spiritual care.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+       <!-- ================================================================
+             PUBLISHER SECTION
+        ================================================================ -->
+        <section id="publisher" class="publisher-section section-pad" aria-labelledby="publisher-heading" data-reveal>
+            <div class="container">
+                <div class="luxury-card publisher-card">
+                    <div class="publisher-split">
+                        <div class="publisher-image-col">
+                            <div class="portrait-frame portrait-frame-sm">
+                                <img src="./images/publisher.jpeg" alt="Jürgen John, Publisher" class="portrait-img" loading="lazy" width="300" height="375">
+                                <div class="portrait-accent" aria-hidden="true"></div>
+                            </div>
+                        </div>
+                        <div class="publisher-text-col">
+                            <span class="eyebrow">Production House</span>
+                            <h2 class="section-title" id="publisher-heading">Jürgen John Publishing</h2>
+                            <p class="body-text-secondary">Jürgen John is a retired engineering executive from Daimler-Benz, entrepreneur, mentor, world traveler, philanthropist, and founder of Hooklift. Together with his wife Uta, he has dedicated his life to encouraging people, building relationships across cultures, and supporting meaningful causes. What began as a chance meeting on a beach in Chennai evolved into a remarkable friendship that bridged East and West, eventually becoming an important part of the journey behind this book.
+                            <div class="info-list" role="list">
+                                <div class="info-item" role="listitem">
+                                    <div class="info-icon" aria-hidden="true">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <div class="info-body">
+                                        <span class="info-label">Publisher</span>
+                                        <span class="info-value">Jürgen John</span>
+                                    </div>
+                                </div>
+                                <div class="info-item" role="listitem">
+                                    <div class="info-icon" aria-hidden="true">
+                                        <i class="fas fa-phone-alt"></i>
+                                    </div>
+                                    <div class="info-body">
+                                        <span class="info-label">Hotline</span>
+                                        <a href="tel:+491708172378" class="info-link">+49 170 8172378</a>
+                                    </div>
+                                </div>
+                                <div class="info-item" role="listitem">
+                                    <div class="info-icon" aria-hidden="true">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="info-body">
+                                        <span class="info-label">Email</span>
+                                        <a href="mailto:juergenjohn01@myquix.de" class="info-link"> info@five-rupees-dreams.com</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
 
         <!-- ================================================================
              GALLERY SECTION
@@ -280,7 +319,7 @@
                             </div>
                             <div class="form-field">
                                 <label for="rev-title">Your Title <span aria-label="optional">(optional)</span></label>
-                                <input type="text" id="rev-title" name="rev-title" placeholder="e.g. Ministry Leader" autocomplete="organization-title">
+                                <input type="text" id="rev-title" name="rev-title" placeholder="e.g. Ministry Leader">
                             </div>
                         </div>
                         <div class="form-field">
@@ -296,59 +335,7 @@
             </div>
         </section>
 
-        <!-- ================================================================
-             PUBLISHER SECTION
-        ================================================================ -->
-        <section id="publisher" class="publisher-section section-pad" aria-labelledby="publisher-heading" data-reveal>
-            <div class="container">
-                <div class="luxury-card publisher-card">
-                    <div class="publisher-split">
-                        <div class="publisher-image-col">
-                            <div class="portrait-frame portrait-frame-sm">
-                                <img src="./images/publisher.jpeg" alt="Jürgen John, Publisher" class="portrait-img" loading="lazy" width="300" height="375">
-                                <div class="portrait-accent" aria-hidden="true"></div>
-                            </div>
-                        </div>
-                        <div class="publisher-text-col">
-                            <span class="eyebrow">Production House</span>
-                            <h2 class="section-title" id="publisher-heading">Jürgen John Publishing</h2>
-                            <p class="body-text-secondary">Managing global strategic deployments, text alignment workflows, and premium international distribution networks for transformational literature.</p>
-
-                            <div class="info-list" role="list">
-                                <div class="info-item" role="listitem">
-                                    <div class="info-icon" aria-hidden="true">
-                                        <i class="fas fa-user-tie"></i>
-                                    </div>
-                                    <div class="info-body">
-                                        <span class="info-label">Publisher</span>
-                                        <span class="info-value">Jürgen John</span>
-                                    </div>
-                                </div>
-                                <div class="info-item" role="listitem">
-                                    <div class="info-icon" aria-hidden="true">
-                                        <i class="fas fa-phone-alt"></i>
-                                    </div>
-                                    <div class="info-body">
-                                        <span class="info-label">Hotline</span>
-                                        <a href="tel:+491708172378" class="info-link">+49 170 8172378</a>
-                                    </div>
-                                </div>
-                                <div class="info-item" role="listitem">
-                                    <div class="info-icon" aria-hidden="true">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
-                                    <div class="info-body">
-                                        <span class="info-label">Email</span>
-                                        <a href="mailto:juergenjohn01@myquix.de" class="info-link">juergenjohn01@myquix.de</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+       
         <!-- ================================================================
              CONTACT SECTION
         ================================================================ -->
@@ -385,7 +372,7 @@
                                 </div>
                                 <div class="info-body">
                                     <span class="info-label">Email</span>
-                                    <a href="mailto:soundfrancis@gmail.com" class="info-link">soundfrancis@gmail.com</a>
+                                    <a href="mailto:soundfrancis@gmail.com" class="info-link">SFrancis@five-rupees-dreams.com </a>
                                 </div>
                             </div>
                         </div>
