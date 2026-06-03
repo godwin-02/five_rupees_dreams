@@ -1,634 +1,951 @@
 /**
- * FRANCIS SOUNDARARAJAN — ULTRA-LUXURY BRAND WEBSITE INTERACTION ENGINE
- * Architectural Lifecycle Orchestration
+ * THE FIVE RUPEES DREAMS — Francis Soundararajan
+ * Premium Author Platform · Complete Interaction Engine
+ * =========================================================
+ * Modules:
+ *  1. ThemeEngine      — dark/light with localStorage
+ *  2. NavEngine        — scroll effects, spy, mobile drawer
+ *  3. GalleryEngine    — swipe + drag gallery with captions
+ *  4. QuotesEngine     — book excerpt carousel
+ *  5. ReviewEngine     — swipeable review carousel + CRUD
+ *  6. ContactEngine    — EmailJS / FormSubmit delivery
+ *  7. UtilEngine       — scroll reveals, back-to-top, footer year
  */
+
+'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ==========================================================================
-    // MODULE 1: PREMIUM NAVIGATION & WINDOW STATE ENGINE
-    // ==========================================================================
-    const NavEngine = (() => {
-        const html = document.documentElement;
-        const nav = document.getElementById('main-nav');
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navLinksWrapper = document.getElementById('nav-links-menu');
-        const scrollProgress = document.getElementById('scroll-progress');
-        const backToTop = document.getElementById('back-to-top');
-        const navLinks = document.querySelectorAll('.nav-links a');
-        const sections = document.querySelectorAll('section[id]');
-
-        const initScrollEffects = () => {
-            window.addEventListener('scroll', () => {
-                const scrollTop = window.scrollY;
-                const docHeight = html.scrollHeight - window.innerHeight;
-
-                if (docHeight > 0) {
-                    scrollProgress.style.width = `${(scrollTop / docHeight) * 100}%`;
-                }
-
-                if (scrollTop > 50) {
-                    nav.classList.add('scrolled');
-                } else {
-                    nav.classList.remove('scrolled');
-                }
-
-                if (scrollTop > 500) {
-                    nav.classList.add('scrolled');
-                    backToTop.classList.add('visible');
-                } else {
-                    backToTop.classList.remove('visible');
-                }
-            }, { passive: true });
-
-            backToTop.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        };
-
-        const initScrollSpy = () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '-30% 0px -50% 0px',
-                threshold: 0
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const activeId = entry.target.getAttribute('id');
-                        navLinks.forEach(link => {
-                            link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
-                        });
-                    }
-                });
-            }, observerOptions);
-
-            sections.forEach(sec => observer.observe(sec));
-
-            window.addEventListener('scroll', () => {
-                if (window.scrollY < 100) {
-                    navLinks.forEach((link, idx) => {
-                        link.classList.toggle('active', idx === 0);
-                    });
-                }
-            }, { passive: true });
-        };
-
-        const initMobileMenu = () => {
-            menuToggle.addEventListener('click', () => {
-                const isOpen = navLinksWrapper.classList.toggle('active');
-                menuToggle.setAttribute('aria-expanded', isOpen);
-            });
-
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinksWrapper.classList.remove('active');
-                    menuToggle.setAttribute('aria-expanded', false);
-                });
-            });
-        };
-
-        const initScrollReveals = () => {
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('revealed');
-                        revealObserver.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
-        };
-
-        return {
-            init: () => {
-                initScrollEffects();
-                initScrollSpy();
-                initMobileMenu();
-                initScrollReveals();
-            }
-        };
-    })();
-
-    // ==========================================================================
-    // MODULE 2: EXCERPTS & CINEMATIC CONTINUOUS GALLERY ENGINE
-    // ==========================================================================
-    const GalleryEngine = (() => {
-        const GALLERY_ITEMS = [
-            {
-                src: "./images/author-parents.jpeg",
-                title: "Sacred Ancestry",
-                caption: "Francis's proud parents, the pillars of his humble origin stories.",
-                description: "A portrait of the author's parents whose early lessons in faith and resilience shaped his lifelong mission."
-            },
-            {
-                src: "./images/author-family.jpeg",
-                title: "Foundational Support",
-                caption: "The complete Soundararajan family sharing a unified journey.",
-                description: "Francis pictured with his loving family, his primary source of inspiration and strength in both ministry and writing."
-            },
-            {
-                src: "./images/author old family photo.jpg",
-                title: "Roots of Resilience",
-                caption: "An archival family portrait capturing the author's early roots and foundation.",
-                description: "A precious, historic glimpse into the early family structure that nurtured Francis's early dreams from a five-rupees beginning."
-            },
-            {
-                src: "./images/author wife cherishing moments.jpg",
-                title: "Devoted Partnership",
-                caption: "Francis Soundararajan sharing a quiet moment of gratitude with his wife.",
-                description: "Celebrating the quiet strength and partnership of marriage that has anchored decades of community leadership."
-            },
-            {
-                src: "./images/author-daughter.jpeg",
-                title: "Joyous Exploration",
-                caption: "A beautiful afternoon snapshot of his daughter exploring outdoors.",
-                description: "Cherishing moments of family life amidst the author's busy global commitments."
-            },
-            {
-                src: "./images/little-daughter.jpeg",
-                title: "The Future Generation",
-                caption: "His youngest daughter sharing a delightful performance on center stage.",
-                description: "The light and hope of the next generation, expressing joy and faith."
-            },
-            {
-                src: "./images/authordaughter.jpeg",
-                title: "Cherished Horizons",
-                caption: "Francis sharing a bright moment with his eldest daughter.",
-                description: "A heartwarming moment showing the close bond between father and daughter."
-            },
-            {
-                src: "./images/author-inlaw.jpeg",
-                title: "Extended Legacies",
-                caption: "A memorable cross-generational portrait with his parents-in-law.",
-                description: "Celebrating heritage and family unity across generations."
-            },
-            {
-                src: "./images/author-fams.jpeg",
-                title: "Kinship & Celebrations",
-                caption: "The vibrancy of the extended family gathered during a celebratory milestone.",
-                description: "A joyous gathering of relatives reflecting the rich, shared community life that anchors the author's stories.",
-                fallback: "./images/family-gathering.jpeg"
-            },
-            {
-                src: "./images/John and Uta the Publishers.JPG",
-                title: "Visionary Collaborators",
-                caption: "Jürgen John and Uta John of Jürgen John Publishing.",
-                description: "The dedicated publishing team responsible for producing and distributing 'The Five Rupees Dreams' globally."
-            },
-            {
-                src: "./images/author with his wife and publisher.jpg",
-                title: "The Publishing Alliance",
-                caption: "The author, his wife, and publisher Jürgen John celebrating the book release.",
-                description: "Commemorating the official milestone of bringing Francis's transformational biography to print."
-            },
-            {
-                src: "./images/the ngo.jpg",
-                title: "Global Humanitarian Initiatives",
-                caption: "The NGO operations and community outreach programs supported by the author's work.",
-                description: "Demonstrating the grassroots humanitarian operations and community development initiatives led by the author."
-            },
-            {
-                src: "./images/author with fr Nelson.JPG",
-                title: "Ministry & Fellowship",
-                caption: "Chaplain Francis Soundararajan in fellowship with Father Nelson.",
-                description: "Strengthening ecumenical bonds and sharing a shared vision of pastoral care and chaplaincy."
-            }
-        ];
-
-        const track    = document.getElementById('gallery-track');
-        const nextBtn  = document.getElementById('slide-next');
-        const prevBtn  = document.getElementById('slide-prev');
-        const viewport = document.querySelector('.premium-slider-viewport');
-
-        let slidesCount     = GALLERY_ITEMS.length;
-        let currentIndex    = 1;
-        let isTransitioning = false;
-        let autoPlayTimer   = null;
-
-        const initQuoteCarousel = () => {
-            const quotes = document.querySelectorAll('.book-quote-item');
-            if (!quotes.length) return;
-            let idx = 0;
-            setInterval(() => {
-                quotes[idx].classList.remove('active');
-                idx = (idx + 1) % quotes.length;
-                quotes[idx].classList.add('active');
-            }, 6000);
-        };
-
-        const renderGallery = () => {
-            if (!track) return;
-            track.innerHTML = '';
-
-            if (slidesCount === 0) {
-                track.innerHTML = '<div class="slide-unit"><p style="color:var(--color-text-secondary);">No images available.</p></div>';
-                nextBtn.style.display = 'none';
-                prevBtn.style.display = 'none';
-                return;
-            }
-
-            if (slidesCount <= 1) {
-                nextBtn.style.display = 'none';
-                prevBtn.style.display = 'none';
-            } else {
-                nextBtn.style.display = 'flex';
-                prevBtn.style.display = 'flex';
-            }
-
-            GALLERY_ITEMS.forEach((item, idx) => {
-                const slide = document.createElement('div');
-                slide.className = 'slide-unit';
-                slide.setAttribute('role', 'group');
-                slide.setAttribute('aria-roledescription', 'slide');
-                slide.setAttribute('aria-label', `${idx + 1} of ${slidesCount}`);
-
-                const img = document.createElement('img');
-                img.src = item.src;
-                img.alt = item.caption;
-                img.loading = 'lazy';
-                if (item.fallback) {
-                    img.onerror = () => { img.src = item.fallback; };
-                }
-
-                const caption = document.createElement('div');
-                caption.className = 'slide-caption';
-                caption.innerHTML = `<h5>${item.title}</h5><p><strong>${item.caption}</strong> — ${item.description}</p>`;
-
-                slide.appendChild(img);
-                slide.appendChild(caption);
-                track.appendChild(slide);
-            });
-
-            if (slidesCount > 1) {
-                const allSlides  = Array.from(track.querySelectorAll('.slide-unit'));
-                const firstClone = allSlides[0].cloneNode(true);
-                const lastClone  = allSlides[slidesCount - 1].cloneNode(true);
-                firstClone.setAttribute('aria-hidden', 'true');
-                lastClone.setAttribute('aria-hidden', 'true');
-                firstClone.removeAttribute('role');
-                lastClone.removeAttribute('role');
-                track.insertBefore(lastClone, track.firstElementChild);
-                track.appendChild(firstClone);
-            }
-
-            track.style.transition = 'none';
-            track.style.transform  = slidesCount > 1 ? 'translateX(-100%)' : 'translateX(0)';
-            track.offsetHeight; // force reflow
-            track.style.transition = '';
-        };
-
-        const setupSliderInteractions = () => {
-            if (!track || slidesCount <= 1) return;
-
-            track.addEventListener('transitionend', () => {
-                isTransitioning = false;
-                if (currentIndex === slidesCount + 1) {
-                    track.style.transition = 'none';
-                    currentIndex = 1;
-                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                    track.offsetHeight;
-                    track.style.transition = '';
-                }
-                if (currentIndex === 0) {
-                    track.style.transition = 'none';
-                    currentIndex = slidesCount;
-                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                    track.offsetHeight;
-                    track.style.transition = '';
-                }
-            });
-
-            const moveToSlide = (targetIndex) => {
-                if (isTransitioning) return;
-                isTransitioning = true;
-                currentIndex = targetIndex;
-                track.style.transform = `translateX(-${currentIndex * 100}%)`;
-            };
-
-            const nextSlide = () => moveToSlide(currentIndex + 1);
-            const prevSlide = () => moveToSlide(currentIndex - 1);
-
-            nextBtn.addEventListener('click', () => { nextSlide(); resetAutoplay(); });
-            prevBtn.addEventListener('click', () => { prevSlide(); resetAutoplay(); });
-
-            document.addEventListener('keydown', (e) => {
-                const rect      = viewport.getBoundingClientRect();
-                const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
-                const isTyping  = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-                if (isVisible && !isTyping) {
-                    if (e.key === 'ArrowRight') { nextSlide(); resetAutoplay(); }
-                    if (e.key === 'ArrowLeft')  { prevSlide(); resetAutoplay(); }
-                }
-            });
-
-            let startX = 0;
-            track.addEventListener('touchstart', (e) => { startX = e.changedTouches[0].screenX; }, { passive: true });
-            track.addEventListener('touchend',   (e) => {
-                const delta = startX - e.changedTouches[0].screenX;
-                if (Math.abs(delta) > 60) {
-                    delta > 0 ? nextSlide() : prevSlide();
-                    resetAutoplay();
-                }
-            }, { passive: true });
-
-            const startAutoplay = () => { autoPlayTimer = setInterval(nextSlide, 5500); };
-            const resetAutoplay = () => { clearInterval(autoPlayTimer); startAutoplay(); };
-
-            viewport.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
-            viewport.addEventListener('mouseleave', startAutoplay);
-            startAutoplay();
-        };
-
-        return {
-            init: () => {
-                initQuoteCarousel();
-                renderGallery();
-                setupSliderInteractions();
-            }
-        };
-    })();
-
-    // ==========================================================================
-    // MODULE 3: REVIEWS DATA & INFINITE MARQUEE CRUD ENGINE  (FIXED)
-    // ==========================================================================
-    const ReviewCRUDEngine = (() => {
-
-        // ── DOM refs ──────────────────────────────────────────────────────────
-        const form            = document.getElementById('review-crud-form');
-        const editIndexInput  = document.getElementById('review-edit-index');
-        const submitBtn       = document.getElementById('rev-submit-btn');
-        const outputTarget    = document.getElementById('reviews-output-target');
-        const actionTitle     = document.getElementById('form-action-title');
-        const feedbackEl      = document.getElementById('review-form-feedback');
-        const marqueeViewport = document.querySelector('.reviews-marquee-viewport');
-
-        // ── Default seed reviews (empty — reviews come from user submissions only) ──
-        const DEFAULT_REVIEWS = [];
-
-        const STORAGE_KEY = 'soundar-lux-reviews-v4';
-        let reviewsData   = [];
-
-        // ── Utility: today as readable string ────────────────────────────────
-        const todayStr = () => new Date().toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'short', year: 'numeric'
-        });
-
-        // ── XSS guard ─────────────────────────────────────────────────────────
-        const esc = (str) => {
-            const map = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' };
-            return String(str || '').replace(/[&<>"']/g, m => map[m]);
-        };
-
-        // ── LocalStorage ──────────────────────────────────────────────────────
-        const loadReviews = () => {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                reviewsData = raw ? JSON.parse(raw) : null;
-                if (!Array.isArray(reviewsData) || reviewsData.length === 0) {
-                    reviewsData = DEFAULT_REVIEWS.map(r => ({ ...r }));
-                    saveReviews();
-                }
-            } catch (_) {
-                reviewsData = DEFAULT_REVIEWS.map(r => ({ ...r }));
-            }
-        };
-
-        const saveReviews = () => {
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(reviewsData)); }
-            catch (_) { /* storage blocked — degrade silently */ }
-        };
-
-        // ── Build one review card DOM node ────────────────────────────────────
-        const buildCard = (rev, idx) => {
-            const card = document.createElement('div');
-            card.className = 'crud-review-node';
-            card.dataset.idx = idx;
-
-            const stars = '★★★★★';
-
-            card.innerHTML = `
-                <div class="review-card-body">
-                    <span class="review-stars" aria-label="5 out of 5 stars">${stars}</span>
-                    <p class="crud-text">"${esc(rev.text)}"</p>
-                    <h5 class="crud-author">${esc(rev.name)}</h5>
-                    ${rev.title ? `<span class="crud-meta">${esc(rev.title)}</span>` : ''}
-                    <span class="crud-date">${esc(rev.date || '')}</span>
-                </div>
-                <div class="crud-actions-wrapper">
-                    <button type="button" class="crud-btn btn-edit" data-action="edit" data-idx="${idx}" aria-label="Edit review by ${esc(rev.name)}">
-                        <i class="fas fa-edit" aria-hidden="true"></i> Edit
-                    </button>
-                    <button type="button" class="crud-btn btn-delete" data-action="delete" data-idx="${idx}" aria-label="Delete review by ${esc(rev.name)}">
-                        <i class="fas fa-trash-alt" aria-hidden="true"></i> Delete
-                    </button>
-                </div>`;
-
-            return card;
-        };
-
-        // ── Render marquee from current reviewsData (single group, no loop) ──
-        const renderMarquee = () => {
-            if (!outputTarget) return;
-
-            outputTarget.removeEventListener('click', _handleCardAction);
-            outputTarget.innerHTML = '';
-
-            if (reviewsData.length === 0) {
-                outputTarget.innerHTML =
-                    '<p style="padding:2rem;color:var(--color-text-secondary);">No reviews yet — be the first to share your experience.</p>';
-                return;
-            }
-
-            const group = document.createElement('div');
-            group.className = 'marquee-group';
-
-            reviewsData.forEach((rev, idx) => {
-                group.appendChild(buildCard(rev, idx));
-            });
-
-            outputTarget.appendChild(group);
-            outputTarget.addEventListener('click', _handleCardAction);
-        };
-
-        // ── Delegated action handler for Edit / Delete buttons ────────────────
-        const _handleCardAction = (e) => {
-            const btn = e.target.closest('[data-action]');
-            if (!btn) return;
-            const idx    = parseInt(btn.dataset.idx, 10);
-            const action = btn.dataset.action;
-            if (action === 'edit')   triggerEdit(idx);
-            if (action === 'delete') triggerDelete(idx);
-        };
-
-        // ── Delete ────────────────────────────────────────────────────────────
-        const triggerDelete = (idx) => {
-            if (isNaN(idx) || idx < 0 || idx >= reviewsData.length) return;
-            showDeleteModal(idx);
-        };
-
-        // ── Elegant delete confirmation modal ─────────────────────────────────
-        const showDeleteModal = (idx) => {
-            const overlay  = document.getElementById('delete-modal-overlay');
-            const confirmBtn = document.getElementById('modal-confirm');
-            const cancelBtn  = document.getElementById('modal-cancel');
-            if (!overlay) return;
-
-            overlay.classList.add('modal-visible');
-
-            // Clone buttons to wipe any prior event listeners
-            const newConfirm = confirmBtn.cloneNode(true);
-            const newCancel  = cancelBtn.cloneNode(true);
-            confirmBtn.replaceWith(newConfirm);
-            cancelBtn.replaceWith(newCancel);
-
-            const close = () => overlay.classList.remove('modal-visible');
-
-            newConfirm.addEventListener('click', () => {
-                close();
-                reviewsData.splice(idx, 1);
-                saveReviews();
-                renderMarquee();
-                resetForm();
-            });
-
-            newCancel.addEventListener('click', close);
-
-            // Close on backdrop click
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) close();
-            }, { once: true });
-
-            // Close on Escape key
-            const onKey = (e) => {
-                if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); }
-            };
-            document.addEventListener('keydown', onKey);
-
-            // Focus the cancel button for accessibility
-            newCancel.focus();
-        };
-
-        // ── Edit: populate form ────────────────────────────────────────────────
-        const triggerEdit = (idx) => {
-            if (isNaN(idx) || idx < 0 || idx >= reviewsData.length) return;
-            const r = reviewsData[idx];
-            document.getElementById('rev-name').value  = r.name  || '';
-            document.getElementById('rev-title').value = r.title || '';
-            document.getElementById('rev-text').value  = r.text  || '';
-            editIndexInput.value      = idx;
-            submitBtn.textContent     = 'Modify Review Entry';
-            actionTitle.textContent   = 'Edit Review Statement';
-            clearFeedback();
-            document.getElementById('reviews').scrollIntoView({ behavior: 'smooth' });
-        };
-
-        // Keep global aliases for any legacy inline calls (safety net)
-        window.editReviewSystemTrigger   = triggerEdit;
-        window.deleteReviewSystemTrigger = triggerDelete;
-
-        // ── Feedback helpers ──────────────────────────────────────────────────
-        const showError = (msg) => {
-            if (!feedbackEl) return;
-            feedbackEl.textContent = msg;
-            feedbackEl.className   = 'review-feedback feedback-error';
-        };
-
-        const showSuccess = (msg) => {
-            if (!feedbackEl) return;
-            feedbackEl.textContent = msg;
-            feedbackEl.className   = 'review-feedback feedback-success';
-            setTimeout(clearFeedback, 4000);
-        };
-
-        const clearFeedback = () => {
-            if (!feedbackEl) return;
-            feedbackEl.textContent = '';
-            feedbackEl.className   = 'review-feedback';
-        };
-
-        // ── Reset form to default create-state ────────────────────────────────
-        const resetForm = () => {
-            if (form) form.reset();
-            editIndexInput.value    = '';
-            submitBtn.textContent   = 'Publish Review';
-            actionTitle.textContent = 'Leave an Impression';
-            clearFeedback();
-        };
-
-        // ── Form submit: create or update ─────────────────────────────────────
-        const initFormHandler = () => {
-            if (!form) return;
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const nameEl  = document.getElementById('rev-name');
-                const titleEl = document.getElementById('rev-title');
-                const textEl  = document.getElementById('rev-text');
-
-                const name    = (nameEl?.value  || '').trim();
-                const title   = (titleEl?.value || '').trim();
-                const text    = (textEl?.value  || '').trim();
-                const editIdx = editIndexInput.value;
-
-                // ── Validation ────────────────────────────────────────────────
-                if (!name) {
-                    showError('Please enter your name.');
-                    nameEl?.focus();
-                    return;
-                }
-                if (!text) {
-                    showError('Please write a review.');
-                    textEl?.focus();
-                    return;
-                }
-
-                const reviewObj = { name, title, text, date: todayStr() };
-
-                if (editIdx !== '') {
-                    // ── Update existing entry ─────────────────────────────────
-                    const idx = parseInt(editIdx, 10);
-                    if (!isNaN(idx) && idx >= 0 && idx < reviewsData.length) {
-                        // Preserve original submission date
-                        reviewObj.date = reviewsData[idx].date || todayStr();
-                        reviewsData[idx] = reviewObj;
-                    }
-                } else {
-                    // ── New review: prepend so it appears first ────────────────
-                    reviewsData.unshift(reviewObj);
-                }
-
-                saveReviews();
-                renderMarquee();
-                resetForm();
-                showSuccess('Your review has been published successfully.');
-
-                // Scroll to reviews marquee so user sees their card immediately
-                outputTarget?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            });
-        };
-
-        // ── Mobile touch-pause (no-op — marquee no longer animates) ─────────
-        const initMarqueeTouchPause = () => {};
-
-        return {
-            init: () => {
-                loadReviews();
-                renderMarquee();
-                initFormHandler();
-                initMarqueeTouchPause();
-            }
-        };
-    })();
-
-    // ==========================================================================
-    // INITIALIZATION COORDINATOR
-    // ==========================================================================
-    NavEngine.init();
-    GalleryEngine.init();
-    ReviewCRUDEngine.init();
-});
+/* ============================================================
+   1. THEME ENGINE
+   ============================================================ */
+const ThemeEngine = (() => {
+  const html   = document.documentElement;
+  const btn    = document.getElementById('theme-toggle');
+  const icon   = btn ? btn.querySelector('i') : null;
+  const KEY    = 'frd-theme';
+
+  const apply = (theme) => {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem(KEY, theme);
+    if (icon) {
+      icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    if (btn) btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  };
+
+  const init = () => {
+    const saved  = localStorage.getItem(KEY);
+    const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    apply(saved || system);
+
+    if (btn) {
+      btn.addEventListener('click', () => {
+        apply(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem(KEY)) apply(e.matches ? 'dark' : 'light');
+    });
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   2. NAV ENGINE
+   ============================================================ */
+const NavEngine = (() => {
+  const nav        = document.getElementById('main-nav');
+  const toggle     = document.getElementById('menu-toggle');
+  const drawer     = document.getElementById('nav-drawer');
+  const overlay    = document.getElementById('nav-overlay');
+  const progress   = document.getElementById('scroll-progress');
+  const backTop    = document.getElementById('back-to-top');
+  const navLinks   = document.querySelectorAll('.nav-links a');
+  const sections   = document.querySelectorAll('main section[id]');
+  const html       = document.documentElement;
+
+  /* Scroll progress + nav shrink + back-to-top */
+  const onScroll = () => {
+    const scrollY   = window.scrollY;
+    const maxScroll = html.scrollHeight - window.innerHeight;
+    if (progress && maxScroll > 0) {
+      progress.style.width = ((scrollY / maxScroll) * 100) + '%';
+    }
+    nav  && nav.classList.toggle('scrolled', scrollY > 40);
+    backTop && backTop.classList.toggle('visible', scrollY > 500);
+  };
+
+  /* Scroll spy */
+  const initSpy = () => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          navLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
+    sections.forEach(s => obs.observe(s));
+  };
+
+  /* Mobile drawer */
+  const openDrawer = () => {
+    drawer  && drawer.classList.add('open');
+    overlay && overlay.classList.add('active');
+    toggle  && toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeDrawer = () => {
+    drawer  && drawer.classList.remove('open');
+    overlay && overlay.classList.remove('active');
+    toggle  && toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  };
+
+  const init = () => {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    initSpy();
+
+    toggle  && toggle.addEventListener('click', () => {
+      drawer && drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+
+    overlay && overlay.addEventListener('click', closeDrawer);
+
+    navLinks.forEach(a => a.addEventListener('click', closeDrawer));
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    backTop && backTop.addEventListener('click', () =>
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    );
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   3. GALLERY ENGINE
+   ============================================================ */
+const GalleryEngine = (() => {
+
+  const ITEMS = [
+    {
+      src: './images/author.jpeg',
+      title: 'The Author',
+      caption: 'Francis Soundararajan — Author, Chaplain & Humanitarian.',
+      desc: 'A defining portrait of the man behind The Five Rupees Dreams, whose journey from poverty to purpose has inspired thousands.'
+    },
+    {
+      src: './images/author-parents.jpeg',
+      title: 'Sacred Ancestry',
+      caption: 'The pillars of a humble origin — Francis with his parents.',
+      desc: "A portrait of the author's parents, whose early lessons in faith and resilience shaped his lifelong mission."
+    },
+    {
+      src: './images/author-family.jpeg',
+      title: 'Foundational Support',
+      caption: 'The complete Soundararajan family sharing a unified journey.',
+      desc: 'Francis pictured with his loving family — his primary source of inspiration and strength in both ministry and writing.'
+    },
+    {
+      src: './images/author old family photo.jpg',
+      title: 'Roots of Resilience',
+      caption: 'An archival portrait capturing the author\'s earliest roots.',
+      desc: 'A precious historic glimpse into the family structure that nurtured Francis\'s dreams from a five-rupees beginning.'
+    },
+    {
+      src: './images/author wife cherishing moments.jpg',
+      title: 'Devoted Partnership',
+      caption: 'Francis sharing a quiet moment of gratitude with his wife.',
+      desc: 'Celebrating the quiet strength and partnership of marriage that has anchored decades of community leadership.'
+    },
+    {
+      src: './images/author-daughter.jpeg',
+      title: 'Joyous Exploration',
+      caption: 'A beautiful snapshot of his daughter exploring the world.',
+      desc: 'Cherishing moments of family life amidst the author\'s busy global commitments.'
+    },
+    {
+      src: './images/little-daughter.jpeg',
+      title: 'The Future Generation',
+      caption: 'His youngest daughter — radiant with hope and possibility.',
+      desc: 'The light and hope of the next generation, expressing joy and faith in abundance.'
+    },
+    {
+      src: './images/authordaughter.jpeg',
+      title: 'Cherished Horizons',
+      caption: 'Francis sharing a bright moment with his eldest daughter.',
+      desc: 'A heartwarming moment showing the unbreakable bond between father and daughter.'
+    },
+    {
+      src: './images/author-inlaw.jpeg',
+      title: 'Extended Legacies',
+      caption: 'A cross-generational portrait with his parents-in-law.',
+      desc: 'Celebrating heritage and family unity woven across generations.'
+    },
+    {
+      src: './images/author-fams.jpeg',
+      title: 'Kinship & Celebration',
+      caption: 'The extended family gathered during a celebratory milestone.',
+      desc: 'A joyous gathering of relatives reflecting the rich community life that anchors the author\'s story.',
+      fallback: './images/family-gathering.jpeg'
+    },
+    {
+      src: './images/John and Uta the Publishers.JPG',
+      title: 'Visionary Collaborators',
+      caption: 'Jürgen John and Uta John — the publishing visionaries.',
+      desc: 'The dedicated publishing team behind distributing The Five Rupees Dreams to the global stage.'
+    },
+    {
+      src: './images/author with his wife and publisher.jpg',
+      title: 'The Publishing Alliance',
+      caption: 'The author, his wife, and publisher at the book release.',
+      desc: 'Commemorating the official milestone of bringing this transformational biography to print.'
+    },
+    {
+      src: './images/the ngo.jpg',
+      title: 'Global Humanitarian Impact',
+      caption: 'Community outreach programs supported by the author\'s work.',
+      desc: 'Demonstrating the grassroots humanitarian operations and community development initiatives led by the author.'
+    },
+    {
+      src: './images/author with fr Nelson.JPG',
+      title: 'Ministry & Fellowship',
+      caption: 'Chaplain Francis Soundararajan in fellowship with Father Nelson.',
+      desc: 'Strengthening ecumenical bonds and sharing a vision of pastoral care and chaplaincy worldwide.'
+    }
+  ];
+
+  const track    = document.getElementById('gallery-track');
+  const prevBtn  = document.getElementById('gallery-prev');
+  const nextBtn  = document.getElementById('gallery-next');
+  const dotsWrap = document.getElementById('gallery-dots');
+  const curEl    = document.getElementById('gallery-current');
+  const totEl    = document.getElementById('gallery-total');
+  const viewport = document.querySelector('.gallery-viewport');
+
+  let current      = 0;
+  let isAnimating  = false;
+  let autoTimer    = null;
+  let dragStart    = 0;
+  let isDragging   = false;
+
+  const total = ITEMS.length;
+
+  const buildSlides = () => {
+    if (!track) return;
+    track.innerHTML = '';
+
+    ITEMS.forEach((item, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'gallery-slide';
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', `Photo ${i + 1} of ${total}: ${item.title}`);
+
+      const img = document.createElement('img');
+      img.src     = item.src;
+      img.alt     = item.caption;
+      img.loading = i === 0 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      if (item.fallback) img.onerror = () => { img.src = item.fallback; };
+
+      const cap = document.createElement('div');
+      cap.className = 'gallery-caption';
+      cap.setAttribute('aria-hidden', 'true');
+      cap.innerHTML = `<h5>${item.title}</h5><p>${item.caption} — ${item.desc}</p>`;
+
+      slide.appendChild(img);
+      slide.appendChild(cap);
+      track.appendChild(slide);
+    });
+  };
+
+  const buildDots = () => {
+    if (!dotsWrap) return;
+    dotsWrap.innerHTML = '';
+    ITEMS.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', `Go to photo ${i + 1}`);
+      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+  };
+
+  const updateUI = () => {
+    if (curEl) curEl.textContent = current + 1;
+    if (totEl) totEl.textContent = total;
+
+    const dots = dotsWrap ? dotsWrap.querySelectorAll('.gallery-dot') : [];
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+      d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+    });
+  };
+
+  const goTo = (index) => {
+    if (isAnimating || index === current) return;
+    isAnimating = true;
+    current = (index + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    updateUI();
+    setTimeout(() => { isAnimating = false; }, 580);
+  };
+
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  const startAuto = () => {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(next, 5500);
+  };
+
+  const stopAuto  = () => clearInterval(autoTimer);
+
+  /* Pointer / touch drag */
+  const onDragStart = (x) => { dragStart = x; isDragging = true; stopAuto(); };
+  const onDragEnd   = (x) => {
+    if (!isDragging) return;
+    isDragging = false;
+    const delta = dragStart - x;
+    if (Math.abs(delta) > 50) { delta > 0 ? next() : prev(); }
+    startAuto();
+  };
+
+  const bindDrag = () => {
+    if (!viewport) return;
+
+    /* Touch */
+    viewport.addEventListener('touchstart', e => onDragStart(e.changedTouches[0].clientX), { passive: true });
+    viewport.addEventListener('touchend',   e => onDragEnd(e.changedTouches[0].clientX),   { passive: true });
+
+    /* Mouse / Pointer */
+    viewport.addEventListener('mousedown',  e => { e.preventDefault(); onDragStart(e.clientX); });
+    window.addEventListener ('mouseup',    e => onDragEnd(e.clientX));
+    viewport.style.cursor = 'grab';
+    viewport.addEventListener('mousedown', () => { viewport.style.cursor = 'grabbing'; });
+    window.addEventListener ('mouseup',   () => { viewport.style.cursor = 'grab'; });
+  };
+
+  const init = () => {
+    if (!track) return;
+    buildSlides();
+    buildDots();
+    updateUI();
+
+    /* set track to flex with translateX */
+    track.style.transform = 'translateX(0)';
+
+    prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
+    nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
+
+    /* Keyboard */
+    document.addEventListener('keydown', e => {
+      if (!viewport) return;
+      const r = viewport.getBoundingClientRect();
+      if (r.top > window.innerHeight || r.bottom < 0) return;
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight') { next(); startAuto(); }
+      if (e.key === 'ArrowLeft')  { prev(); startAuto(); }
+    });
+
+    bindDrag();
+
+    viewport && viewport.addEventListener('mouseenter', stopAuto);
+    viewport && viewport.addEventListener('mouseleave', startAuto);
+    startAuto();
+  };
+
+  return { init };
+})();
+
+
+/* ============================================================
+   4. QUOTES ENGINE (Book excerpts)
+   ============================================================ */
+const QuotesEngine = (() => {
+  const slides  = document.querySelectorAll('.quote-slide');
+  const dots    = document.querySelectorAll('.quote-dot');
+  let current   = 0;
+  let timer     = null;
+
+  const goTo = (i) => {
+    slides[current].classList.remove('active');
+    dots[current]  && dots[current].classList.remove('active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current]  && dots[current].classList.add('active');
+  };
+
+  const init = () => {
+    if (!slides.length) return;
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => { goTo(i); resetTimer(); });
+    });
+
+    const resetTimer = () => {
+      clearInterval(timer);
+      timer = setInterval(() => goTo(current + 1), 6000);
+    };
+
+    resetTimer();
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   5. REVIEW ENGINE — swipeable carousel + CRUD
+   ============================================================ */
+const ReviewEngine = (() => {
+
+  /* ── Seed reviews ───────────────────────────────────────── */
+  const SEED = [
+    {
+      name: 'Dr. Priya Menon',
+      role: 'Community Leader',
+      text: 'A breathtaking journey from five rupees to a life of extraordinary purpose. Francis\'s story dismantles every excuse we have for not chasing our dreams.',
+      date: '12 Jan 2026'
+    },
+    {
+      name: 'Reverend James Okafor',
+      role: 'Chaplaincy Advocate',
+      text: 'Profoundly moving. This biography transcends the memoir genre entirely — it becomes a spiritual companion for anyone navigating hardship.',
+      date: '3 Feb 2026'
+    },
+    {
+      name: 'Lena Hoffmann',
+      role: 'International Reader',
+      text: 'I could not put it down. Francis writes with such raw honesty and warmth. Every page felt like a letter written directly to me.',
+      date: '19 Feb 2026'
+    },
+    {
+      name: 'Samuel Krishnaswamy',
+      role: 'Ministry Partner',
+      text: 'The Five Rupees Dreams is not just a book — it is a blueprint for purposeful living. I recommend it to every leader I know.',
+      date: '4 Mar 2026'
+    },
+    {
+      name: 'Anika Rosen',
+      role: 'Book Club Organiser',
+      text: 'Our book club had the most vibrant discussion about this book. It sparked conversations about faith, poverty, and what it truly means to succeed.',
+      date: '28 Mar 2026'
+    },
+    {
+      name: 'Pastor David Osei',
+      role: 'Ghanaian Ministry Leader',
+      text: 'Francis\'s humility shines through every chapter. A story of God\'s faithfulness told through one man\'s incredible journey across continents.',
+      date: '11 Apr 2026'
+    }
+  ];
+
+  const STORAGE_KEY = 'frd-reviews-v5';
+
+  /* ── DOM refs ───────────────────────────────────────────── */
+  const track      = document.getElementById('reviews-track');
+  const prevBtn    = document.getElementById('reviews-prev');
+  const nextBtn    = document.getElementById('reviews-next');
+  const dotsWrap   = document.getElementById('reviews-dots');
+  const curEl      = document.getElementById('rev-current');
+  const totEl      = document.getElementById('rev-total');
+  const form       = document.getElementById('review-form');
+  const editIdxInp = document.getElementById('rev-edit-index');
+  const submitBtn  = document.getElementById('rev-submit-btn');
+  const formTitle  = document.getElementById('review-form-title');
+  const feedback   = document.getElementById('review-feedback');
+  const modal      = document.getElementById('delete-modal');
+  const modalOk    = document.getElementById('modal-confirm');
+  const modalNo    = document.getElementById('modal-cancel');
+
+  /* ── State ──────────────────────────────────────────────── */
+  let reviews     = [];
+  let current     = 0;
+  let isAnim      = false;
+  let autoTimer   = null;
+  let dragStart   = 0;
+  let isDragging  = false;
+  const PER_PAGE  = 2; /* cards per "slide" on desktop */
+
+  /* ── Storage ────────────────────────────────────────────── */
+  const load = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      reviews = raw ? JSON.parse(raw) : null;
+      if (!Array.isArray(reviews) || reviews.length === 0) {
+        reviews = SEED.map(r => ({ ...r }));
+        save();
+      }
+    } catch (_) { reviews = SEED.map(r => ({ ...r })); }
+  };
+
+  const save = () => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews)); } catch (_) {}
+  };
+
+  /* ── XSS guard ──────────────────────────────────────────── */
+  const esc = s => String(s || '').replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[c])
+  );
+
+  /* ── Page count ─────────────────────────────────────────── */
+  const perPage  = () => window.innerWidth < 640 ? 1 : 2;
+  const pages    = () => Math.ceil(reviews.length / perPage());
+
+  /* ── Build track ────────────────────────────────────────── */
+  const render = () => {
+    if (!track) return;
+    const pp    = perPage();
+    const total = pages();
+    track.innerHTML = '';
+
+    for (let p = 0; p < total; p++) {
+      const page = document.createElement('div');
+      page.className = 'review-card';
+      page.setAttribute('role', 'group');
+      page.setAttribute('aria-roledescription', 'slide');
+      page.setAttribute('aria-label', `Reviews page ${p + 1} of ${total}`);
+
+      const slice = reviews.slice(p * pp, p * pp + pp);
+      slice.forEach((rev, localIdx) => {
+        const globalIdx = p * pp + localIdx;
+        page.appendChild(buildCard(rev, globalIdx));
+      });
+
+      track.appendChild(page);
+    }
+
+    /* Update counter & dots */
+    if (curEl) curEl.textContent = Math.min(current + 1, total);
+    if (totEl) totEl.textContent = total;
+
+    buildDots(total);
+    clampIndex(total);
+    applyTransform();
+  };
+
+  const buildCard = (rev, idx) => {
+    const node = document.createElement('div');
+    node.className = 'review-node';
+    node.innerHTML = `
+      <span class="review-stars" aria-label="5 stars">★★★★★</span>
+      <p class="review-text">"${esc(rev.text)}"</p>
+      <h5 class="review-author">${esc(rev.name)}</h5>
+      ${rev.role ? `<span class="review-role">${esc(rev.role)}</span>` : ''}
+      <span class="review-date">${esc(rev.date || '')}</span>
+      <div class="review-actions" aria-label="Review actions">
+        <button class="review-crud-btn btn-edit-rev" data-action="edit" data-idx="${idx}" aria-label="Edit review by ${esc(rev.name)}">
+          <i class="fas fa-pen" aria-hidden="true"></i> Edit
+        </button>
+        <button class="review-crud-btn btn-delete-rev" data-action="delete" data-idx="${idx}" aria-label="Delete review by ${esc(rev.name)}">
+          <i class="fas fa-trash" aria-hidden="true"></i> Delete
+        </button>
+      </div>`;
+    return node;
+  };
+
+  const buildDots = (total) => {
+    if (!dotsWrap) return;
+    dotsWrap.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'reviews-dot' + (i === current ? ' active' : '');
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', `Reviews page ${i + 1}`);
+      dot.setAttribute('aria-selected', i === current ? 'true' : 'false');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    }
+  };
+
+  const clampIndex = (total) => {
+    if (current >= total) current = Math.max(0, total - 1);
+  };
+
+  const applyTransform = () => {
+    if (track) track.style.transform = `translateX(-${current * 100}%)`;
+
+    const total = pages();
+    if (curEl) curEl.textContent = Math.min(current + 1, total);
+
+    const dots = dotsWrap ? dotsWrap.querySelectorAll('.reviews-dot') : [];
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+      d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+    });
+  };
+
+  const goTo = (i) => {
+    if (isAnim) return;
+    isAnim  = true;
+    current = (i + pages()) % pages();
+    applyTransform();
+    setTimeout(() => { isAnim = false; }, 580);
+  };
+
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  const startAuto = () => {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(next, 7000);
+  };
+  const stopAuto  = () => clearInterval(autoTimer);
+
+  /* ── Drag / swipe ───────────────────────────────────────── */
+  const container = document.querySelector('.reviews-track-container');
+  const onDs = x => { dragStart = x; isDragging = true; stopAuto(); };
+  const onDe = x => {
+    if (!isDragging) return;
+    isDragging = false;
+    const d = dragStart - x;
+    if (Math.abs(d) > 50) { d > 0 ? next() : prev(); }
+    startAuto();
+  };
+
+  const bindDrag = () => {
+    if (!container) return;
+    container.addEventListener('touchstart', e => onDs(e.changedTouches[0].clientX), { passive: true });
+    container.addEventListener('touchend',   e => onDe(e.changedTouches[0].clientX), { passive: true });
+    container.addEventListener('mousedown',  e => { e.preventDefault(); onDs(e.clientX); });
+    window.addEventListener   ('mouseup',   e => onDe(e.clientX));
+    container.style.cursor = 'grab';
+    container.addEventListener('mousedown', () => { container.style.cursor = 'grabbing'; });
+    window.addEventListener   ('mouseup',  () => { container.style.cursor = 'grab'; });
+  };
+
+  /* ── Delegated click for edit/delete ────────────────────── */
+  const onTrackClick = (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const idx    = parseInt(btn.dataset.idx, 10);
+    const action = btn.dataset.action;
+    if (action === 'edit')   triggerEdit(idx);
+    if (action === 'delete') triggerDelete(idx);
+  };
+
+  /* ── Edit ───────────────────────────────────────────────── */
+  const triggerEdit = (idx) => {
+    if (isNaN(idx) || idx < 0 || idx >= reviews.length) return;
+    const r = reviews[idx];
+    const nameEl  = document.getElementById('rev-name');
+    const titleEl = document.getElementById('rev-title');
+    const textEl  = document.getElementById('rev-text');
+    if (nameEl)  nameEl.value  = r.name  || '';
+    if (titleEl) titleEl.value = r.role  || '';
+    if (textEl)  textEl.value  = r.text  || '';
+    editIdxInp.value   = idx;
+    submitBtn.querySelector('span').textContent = 'Update Review';
+    formTitle.textContent = 'Edit Your Review';
+    clearFb();
+    document.getElementById('review-form-section') &&
+      document.getElementById('review-form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ── Delete modal ───────────────────────────────────────── */
+  const triggerDelete = (idx) => {
+    if (!modal) return;
+    modal.removeAttribute('hidden');
+    requestAnimationFrame(() => modal.removeAttribute('hidden'));
+
+    const newOk = modalOk.cloneNode(true);
+    const newNo = modalNo.cloneNode(true);
+    modalOk.replaceWith(newOk);
+    modalNo.replaceWith(newNo);
+
+    const close = () => {
+      modal.setAttribute('hidden', '');
+      document.removeEventListener('keydown', onEsc);
+    };
+
+    const onEsc = e => { if (e.key === 'Escape') close(); };
+
+    newOk.addEventListener('click', () => {
+      close();
+      reviews.splice(idx, 1);
+      save();
+      current = 0;
+      render();
+      resetForm();
+    });
+
+    newNo.addEventListener('click', close);
+    modal.addEventListener('click', e => { if (e.target === modal) close(); }, { once: true });
+    document.addEventListener('keydown', onEsc);
+    newNo.focus();
+  };
+
+  /* ── Feedback ───────────────────────────────────────────── */
+  const showFb = (msg, type) => {
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.className   = 'form-feedback ' + type;
+    if (type === 'success') setTimeout(clearFb, 5000);
+  };
+  const clearFb = () => {
+    if (!feedback) return;
+    feedback.textContent = '';
+    feedback.className   = 'form-feedback';
+  };
+
+  /* ── Reset form ─────────────────────────────────────────── */
+  const resetForm = () => {
+    if (form) form.reset();
+    editIdxInp.value = '';
+    if (submitBtn) submitBtn.querySelector('span').textContent = 'Publish Review';
+    if (formTitle) formTitle.textContent = 'Leave an Impression';
+    clearFb();
+  };
+
+  /* ── Form submit ────────────────────────────────────────── */
+  const initForm = () => {
+    if (!form) return;
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name  = (document.getElementById('rev-name')?.value  || '').trim();
+      const role  = (document.getElementById('rev-title')?.value || '').trim();
+      const text  = (document.getElementById('rev-text')?.value  || '').trim();
+      const eidx  = editIdxInp.value;
+
+      if (!name) { showFb('Please enter your name.', 'error');   document.getElementById('rev-name')?.focus();  return; }
+      if (!text) { showFb('Please write a review.',  'error');   document.getElementById('rev-text')?.focus();  return; }
+
+      const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      const obj   = { name, role, text, date: today };
+
+      if (eidx !== '') {
+        const i = parseInt(eidx, 10);
+        if (!isNaN(i) && i >= 0 && i < reviews.length) {
+          obj.date     = reviews[i].date || today;
+          reviews[i]   = obj;
+        }
+      } else {
+        reviews.unshift(obj);
+      }
+
+      save();
+      current = 0;
+      render();
+      resetForm();
+      showFb('Your review has been published.', 'success');
+    });
+  };
+
+  /* ── Resize: re-render so per-page adapts ───────────────── */
+  let resizeTimer;
+  const onResize = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { current = 0; render(); }, 300);
+  };
+
+  const init = () => {
+    load();
+    render();
+    bindDrag();
+    initForm();
+
+    prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
+    nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
+    track   && track.addEventListener('click', onTrackClick);
+
+    window.addEventListener('resize', onResize, { passive: true });
+    startAuto();
+  };
+
+  return { init };
+})();
+
+
+/* ============================================================
+   6. CONTACT ENGINE — EmailJS with FormSubmit fallback
+   ============================================================ */
+const ContactEngine = (() => {
+
+  /*
+   * ── EmailJS Setup ────────────────────────────────────────
+   * TO ENABLE EMAIL DELIVERY:
+   *  1. Sign up at https://www.emailjs.com (free tier: 200 emails/month)
+   *  2. Create an Email Service (Gmail, Outlook, etc.)
+   *  3. Create an Email Template with variables:
+   *       {{from_name}}, {{from_email}}, {{message}}
+   *  4. Replace the three constants below with your real values.
+   *
+   * Until configured, the form falls back to FormSubmit.co
+   * which delivers emails without any backend setup.
+   */
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';   // e.g. 'abc123XYZ'
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';           // e.g. 'service_xxxxxx'
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';          // e.g. 'template_xxxxxx'
+  const AUTHOR_EMAIL        = 'soundfrancis@gmail.com';
+
+  const EMAILJS_READY = (
+    EMAILJS_PUBLIC_KEY  !== 'YOUR_EMAILJS_PUBLIC_KEY' &&
+    EMAILJS_SERVICE_ID  !== 'YOUR_SERVICE_ID'         &&
+    EMAILJS_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID'
+  );
+
+  const form      = document.getElementById('contact-form');
+  const submitBtn = document.getElementById('contact-submit-btn');
+  const feedback  = document.getElementById('contact-feedback');
+
+  const showFb = (msg, type) => {
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.className   = 'form-feedback ' + type;
+    if (type === 'success') setTimeout(clearFb, 7000);
+  };
+
+  const clearFb = () => {
+    if (!feedback) return;
+    feedback.textContent = '';
+    feedback.className   = 'form-feedback';
+  };
+
+  const setLoading = (on) => {
+    if (!submitBtn) return;
+    submitBtn.classList.toggle('loading', on);
+    submitBtn.disabled = on;
+  };
+
+  /* ── FormSubmit fallback (no backend, no account needed) ── */
+  const sendViaFormSubmit = async (name, email, message) => {
+    const payload = new FormData();
+    payload.append('name',    name);
+    payload.append('email',   email);
+    payload.append('message', message);
+    payload.append('_subject', `New message from ${name} — Five Rupees Dreams`);
+    payload.append('_captcha', 'false');
+    payload.append('_template', 'box');
+
+    const res = await fetch(`https://formsubmit.co/ajax/${AUTHOR_EMAIL}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: payload
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.success !== 'true') throw new Error('FormSubmit failed');
+  };
+
+  /* ── EmailJS send ──────────────────────────────────────── */
+  const sendViaEmailJS = (name, email, message) => {
+    if (typeof emailjs === 'undefined') throw new Error('EmailJS not loaded');
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      from_name:  name,
+      from_email: email,
+      message:    message,
+      reply_to:   email
+    });
+  };
+
+  const init = () => {
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearFb();
+
+      const name    = (document.getElementById('contact-name')?.value    || '').trim();
+      const email   = (document.getElementById('contact-email')?.value   || '').trim();
+      const message = (document.getElementById('contact-message')?.value || '').trim();
+
+      /* Validation */
+      if (!name)    { showFb('Please enter your name.',         'error'); document.getElementById('contact-name')?.focus();    return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                      showFb('Please enter a valid email.',     'error'); document.getElementById('contact-email')?.focus();   return; }
+      if (!message) { showFb('Please write a message.',         'error'); document.getElementById('contact-message')?.focus(); return; }
+
+      setLoading(true);
+
+      try {
+        if (EMAILJS_READY) {
+          await sendViaEmailJS(name, email, message);
+        } else {
+          await sendViaFormSubmit(name, email, message);
+        }
+        form.reset();
+        showFb('Your message has been sent to Francis. He will be in touch soon.', 'success');
+      } catch (err) {
+        console.error('Contact send error:', err);
+        showFb('Message could not be sent. Please email directly: soundfrancis@gmail.com', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   7. UTIL ENGINE — scroll reveals, back-to-top, footer year
+   ============================================================ */
+const UtilEngine = (() => {
+
+  const initReveals = () => {
+    const els = document.querySelectorAll('[data-reveal]');
+    if (!els.length) return;
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('revealed');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    els.forEach(el => obs.observe(el));
+  };
+
+  const initFooterYear = () => {
+    const el = document.getElementById('footer-year');
+    if (el) el.textContent = new Date().getFullYear();
+  };
+
+  /* Keyboard-accessible modal close */
+  const initModalA11y = () => {
+    document.addEventListener('keydown', e => {
+      const modal = document.getElementById('delete-modal');
+      if (modal && !modal.hasAttribute('hidden') && e.key === 'Escape') {
+        modal.setAttribute('hidden', '');
+      }
+    });
+  };
+
+  const init = () => {
+    initReveals();
+    initFooterYear();
+    initModalA11y();
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   BOOTSTRAP ALL MODULES
+   ============================================================ */
+ThemeEngine.init();
+NavEngine.init();
+GalleryEngine.init();
+QuotesEngine.init();
+ReviewEngine.init();
+ContactEngine.init();
+UtilEngine.init();
+
+}); /* end DOMContentLoaded */
