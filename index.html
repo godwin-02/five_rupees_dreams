@@ -23,9 +23,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -165,26 +162,29 @@
         ================================================================ -->
         <section id="author" class="author-section section-pad" aria-labelledby="author-heading" data-reveal>
             <div class="container">
-                <div class="editorial-split">
-                    <div class="editorial-image-col">
-                        <div class="portrait-frame">
-                            <img src="./images/author.jpeg" alt="Francis Soundararajan, Author & Chaplain" class="portrait-img" loading="lazy" width="400" height="500">
-                            <div class="portrait-accent" aria-hidden="true"></div>
+                <div class="luxury-card author-card">
+                    <div class="publisher-split">
+                        <div class="publisher-image-col editorial-image-col">
+                            <div class="portrait-frame portrait-frame-sm">
+                                <img src="./images/author.jpeg" alt="Francis Soundararajan, Author & Chaplain" class="portrait-img" loading="lazy" width="300" height="375">
+                                <div class="portrait-accent" aria-hidden="true"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="editorial-text-col">
-                        <span class="eyebrow">The Author</span>
-                        <h2 class="section-title" id="author-heading">Francis Soundararajan</h2>
-                        <p class="lead-italic">Author &amp; Chaplain</p>
-                        <div class="body-text">
-                            <p>Francis Soundararajan is a professional chaplain and clinical spiritual care practitioner with a background in pastoral ministry, education, and healthcare chaplaincy. He brings a cross-cultural perspective shaped by service in India and the United States.
-He completed multiple Clinical Pastoral Education (CPE) units, including a residency at Vanderbilt University Medical Center, where he served in ICU, pediatrics, mental health, and palliative care. His work centers on compassionate presence, meaning-making, and holistic spiritual care.</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        <div class="publisher-text-col">
+                            <span class="eyebrow">The Author</span>
+                            <h2 class="section-title" id="author-heading">Francis Soundararajan</h2>
+                            <p class="lead-italic">Author &amp; Chaplain</p>
+                            <div class="body-text">
+                                <p>Francis Soundararajan is a professional chaplain and clinical spiritual care practitioner with a background in pastoral ministry, education, and healthcare chaplaincy. He brings a cross-cultural perspective shaped by service in India and the United States.
+He completed multiple Clinical Pastoral Education (CPE) units, including a residency at Vanderbilt University Medical Center, where he served in ICU, pediatrics, mental health, and palliative care. His work centers on compassionate presence, meaning-making, and holistic spiritual care.</p>
+                            </div>
+                        </div>
+                        </div>
 
-
+                        </div>
+                        </div>
+                        </section>
+                    
        <!-- ================================================================
              PUBLISHER SECTION
         ================================================================ -->
@@ -261,10 +261,6 @@ He completed multiple Clinical Pastoral Education (CPE) units, including a resid
                     <i class="fas fa-chevron-right" aria-hidden="true"></i>
                 </button>
 
-                <div class="gallery-counter" id="gallery-counter" aria-live="polite" aria-atomic="true">
-                    <span id="gallery-current">1</span> / <span id="gallery-total">1</span>
-                </div>
-
                 <div class="gallery-dots" id="gallery-dots" role="tablist" aria-label="Gallery navigation">
                     <!-- Injected by JS -->
                 </div>
@@ -317,10 +313,7 @@ He completed multiple Clinical Pastoral Education (CPE) units, including a resid
                                 <label for="rev-name">Your Name <span aria-hidden="true">*</span></label>
                                 <input type="text" id="rev-name" name="rev-name" placeholder="Full Name" autocomplete="name" required aria-required="true">
                             </div>
-                            <div class="form-field">
-                                <label for="rev-title">Your Title <span aria-label="optional">(optional)</span></label>
-                                <input type="text" id="rev-title" name="rev-title" placeholder="e.g. Ministry Leader">
-                            </div>
+                             
                         </div>
                         <div class="form-field">
                             <label for="rev-text">Your Review <span aria-hidden="true">*</span></label>
@@ -341,20 +334,27 @@ He completed multiple Clinical Pastoral Education (CPE) units, including a resid
         ================================================================ -->
         <section id="contact" class="contact-section section-pad" aria-labelledby="contact-heading" data-reveal>
             <div class="container">
-                <div class="editorial-split contact-split">
-                    <div class="contact-info-col">
-                        <span class="eyebrow">Direct Lines</span>
-                        <h2 class="section-title" id="contact-heading">Get in Touch</h2>
+                <div class="section-header-center">
+                    <span class="eyebrow">Direct Lines</span>
+                    <h2 class="section-title" id="contact-heading">Get in Touch</h2>
+                </div>
+
+                <div class="contact-cards-grid">
+
+                    <!-- Author Contact Card -->
+                    <div class="luxury-card contact-author-card">
+                        <span class="card-eyebrow">Author</span>
+                        <h3 class="card-title">Soundararajan Francis</h3>
                         <p class="body-text-secondary">Reach out directly to the author for inquiries, ministry collaboration, or speaking engagements.</p>
 
                         <div class="info-list" role="list">
                             <div class="info-item" role="listitem">
                                 <div class="info-icon" aria-hidden="true">
-                                    <i class="fas fa-phone"></i>
+                                    <i class="fas fa-envelope"></i>
                                 </div>
                                 <div class="info-body">
-                                    <span class="info-label">US Office</span>
-                                    <a href="tel:+15027687722" class="info-link">+1 (502) 768-7722</a>
+                                    <span class="info-label">Email</span>
+                                    <a href="mailto:soundfrancis@gmail.com" class="info-link">SFrancis@five-rupees-dreams.com</a>
                                 </div>
                             </div>
                             <div class="info-item" role="listitem">
@@ -368,11 +368,11 @@ He completed multiple Clinical Pastoral Education (CPE) units, including a resid
                             </div>
                             <div class="info-item" role="listitem">
                                 <div class="info-icon" aria-hidden="true">
-                                    <i class="fas fa-envelope"></i>
+                                    <i class="fas fa-phone"></i>
                                 </div>
                                 <div class="info-body">
-                                    <span class="info-label">Email</span>
-                                    <a href="mailto:soundfrancis@gmail.com" class="info-link">SFrancis@five-rupees-dreams.com </a>
+                                    <span class="info-label">US Office</span>
+                                    <a href="tel:+15027687722" class="info-link">+1 (502) 768-7722</a>
                                 </div>
                             </div>
                         </div>
@@ -393,7 +393,9 @@ He completed multiple Clinical Pastoral Education (CPE) units, including a resid
                         </div>
                     </div>
 
+                    <!-- Publisher Contact Card -->
                     <div class="luxury-card contact-form-card">
+                        <span class="card-eyebrow">Publishing &amp; Media Contact</span>
                         <h3 class="card-title">Send a Message</h3>
                         <div id="contact-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
                         <form id="contact-form" novalidate autocomplete="off">
@@ -415,7 +417,8 @@ He completed multiple Clinical Pastoral Education (CPE) units, including a resid
                             </button>
                         </form>
                     </div>
-                </div>
+
+                </div><!-- /.contact-cards-grid -->
             </div>
         </section>
 

@@ -122,14 +122,14 @@ const GalleryEngine = (() => {
     },
     {
       src: './images/author old family photo.jpg',
-      title: 'Roots of Resilience',
-      caption: 'An archival portrait capturing the author\'s earliest roots.',
+      title: 'Early Family Memories',
+      caption: 'The roots of a humble journey shaped by love, values, and perseverance.',
       desc: 'A precious historic glimpse into the family structure that nurtured Francis\'s dreams from a five-rupees beginning.'
     },
     {
       src: './images/author wife cherishing moments.jpg',
-      title: 'Devoted Partnership',
-      caption: 'Francis sharing a quiet moment of gratitude with his wife.',
+      title: 'Moments of Togetherness',
+      caption: 'Shared laughter, companionship, and cherished family memories.',
       desc: 'Celebrating the quiet strength and partnership of marriage that has anchored decades of community leadership.'
     },
     {
@@ -140,8 +140,8 @@ const GalleryEngine = (() => {
     },
     {
       src: './images/little-daughter.jpeg',
-      title: 'The Future Generation',
-      caption: 'His youngest daughter — radiant with hope and possibility.',
+      title: 'Little Daughter',
+      caption: 'A source of inspiration, joy, and hope for tomorrow.',
       desc: 'The light and hope of the next generation, expressing joy and faith in abundance.'
     },
     {
@@ -149,6 +149,12 @@ const GalleryEngine = (() => {
       title: 'Cherished Horizons',
       caption: 'Francis sharing a bright moment with his eldest daughter.',
       desc: 'A heartwarming moment showing the unbreakable bond between father and daughter.'
+    },
+    {
+      src: './images/father and daughter.jpeg',
+      title: 'Father & Daughter',
+      caption: 'A tender portrait of love, legacy, and lifelong connection.',
+      desc: 'A quiet moment that speaks volumes — the bond between a father and his daughter, rooted in faith and warmth.'
     },
     {
       src: './images/author-inlaw.jpeg',
@@ -164,28 +170,64 @@ const GalleryEngine = (() => {
       fallback: './images/family-gathering.jpeg'
     },
     {
+      src: './images/cute family.jpeg',
+      title: 'Joyful Family Moments',
+      caption: 'Simple moments that became lasting memories and blessings.',
+      desc: 'A beautiful reminder that the greatest gifts in life are the people we share our journey with.'
+    },
+    {
+      src: './images/family-gathering.jpeg',
+      title: 'Family Gathering',
+      caption: 'Celebrating unity, traditions, and the strength of family bonds.',
+      desc: 'Together in love and laughter — a family gathering that echoes the warmth woven throughout this biography.'
+    },
+    {
+      src: './images/Grandchild.jpeg',
+      title: 'Generations of Hope',
+      caption: 'A reminder that every journey continues through future generations.',
+      desc: 'The story does not end — it is carried forward with joy, innocence, and the promise of tomorrow.'
+    },
+    {
+      src: './images/grandmother.jpeg',
+      title: 'Beloved Grandmother',
+      caption: 'Wisdom, sacrifice, and unconditional love across generations.',
+      desc: 'A portrait honouring the quiet strength of a grandmother whose love laid the foundation for everything that followed.'
+    },
+    {
       src: './images/John and Uta the Publishers.JPG',
-      title: 'Visionary Collaborators',
-      caption: 'Jürgen John and Uta John — the publishing visionaries.',
-      desc: 'The dedicated publishing team behind distributing The Five Rupees Dreams to the global stage.'
+      title: 'Publishing Partners',
+      caption: 'Friends and supporters who helped bring a dream into reality.',
+      desc: 'Jürgen John and Uta John — the dedicated publishing team behind distributing The Five Rupees Dreams to the global stage.'
     },
     {
       src: './images/author with his wife and publisher.jpg',
-      title: 'The Publishing Alliance',
-      caption: 'The author, his wife, and publisher at the book release.',
-      desc: 'Commemorating the official milestone of bringing this transformational biography to print.'
+      title: 'Author, Family & Publisher',
+      caption: 'Celebrating partnership, support, and the journey of publishing.',
+      desc: 'Commemorating the official milestone of bringing this transformational biography to print alongside loved ones.'
     },
     {
-      src: './images/the ngo.jpg',
-      title: 'Global Humanitarian Impact',
-      caption: 'Community outreach programs supported by the author\'s work.',
-      desc: 'Demonstrating the grassroots humanitarian operations and community development initiatives led by the author.'
+      src: './images/jubilee of Fr.Nelson.jpeg',
+      title: 'Jubilee Celebration',
+      caption: 'A joyful milestone honoring faith, service, and dedication.',
+      desc: 'Marking years of faithful service — a jubilee that reflects the enduring spirit of pastoral commitment and community.'
+    },
+    {
+      src: './images/Thooya with Fr. Nelson.jpeg',
+      title: 'Thooya & Fr. Nelson',
+      caption: 'A memorable moment of encouragement, learning, and friendship.',
+      desc: 'A cherished encounter that bridged hearts and deepened the bonds of ecumenical fellowship and mutual respect.'
     },
     {
       src: './images/author with fr Nelson.JPG',
-      title: 'Ministry & Fellowship',
-      caption: 'Chaplain Francis Soundararajan in fellowship with Father Nelson.',
+      title: 'Friendship & Guidance',
+      caption: 'Meaningful moments with mentors who inspired growth and purpose.',
       desc: 'Strengthening ecumenical bonds and sharing a vision of pastoral care and chaplaincy worldwide.'
+    },
+    {
+      src: './images/the ngo.jpg',
+      title: 'Community Service Mission',
+      caption: 'Empowering lives through education, compassion, and social outreach.',
+      desc: 'Demonstrating the grassroots humanitarian operations and community development initiatives led by the author.'
     }
   ];
 
@@ -193,8 +235,6 @@ const GalleryEngine = (() => {
   const prevBtn  = document.getElementById('gallery-prev');
   const nextBtn  = document.getElementById('gallery-next');
   const dotsWrap = document.getElementById('gallery-dots');
-  const curEl    = document.getElementById('gallery-current');
-  const totEl    = document.getElementById('gallery-total');
   const viewport = document.querySelector('.gallery-viewport');
 
   let current      = 0;
@@ -249,9 +289,6 @@ const GalleryEngine = (() => {
   };
 
   const updateUI = () => {
-    if (curEl) curEl.textContent = current + 1;
-    if (totEl) totEl.textContent = total;
-
     const dots = dotsWrap ? dotsWrap.querySelectorAll('.gallery-dot') : [];
     dots.forEach((d, i) => {
       d.classList.toggle('active', i === current);
@@ -717,42 +754,44 @@ const ReviewEngine = (() => {
 
 
 /* ============================================================
-   6. CONTACT ENGINE — EmailJS with FormSubmit fallback
+   6. CONTACT ENGINE
+   ============================================================
+   Two-tier delivery:
+     Tier 1 — POST /api/contact  (Node/Express server.js)
+              Works when the site is served via: npm start
+     Tier 2 — FormSubmit.co      (zero-backend fallback)
+              Works when the site is opened as a static file
+              or the Node server is not yet running.
+   Both tiers deliver to soundarfrancis@gmail.com with
+   Reply-To set to the visitor's email.
    ============================================================ */
 const ContactEngine = (() => {
 
+  /* ── Config ─────────────────────────────────────────────── */
+  const AUTHOR_EMAIL = 'soundarfrancis@gmail.com';
+  const TIMEOUT_MS   = 14000;
+
   /*
-   * ── EmailJS Setup ────────────────────────────────────────
-   * TO ENABLE EMAIL DELIVERY:
-   *  1. Sign up at https://www.emailjs.com (free tier: 200 emails/month)
-   *  2. Create an Email Service (Gmail, Outlook, etc.)
-   *  3. Create an Email Template with variables:
-   *       {{from_name}}, {{from_email}}, {{message}}
-   *  4. Replace the three constants below with your real values.
-   *
-   * Until configured, the form falls back to FormSubmit.co
-   * which delivers emails without any backend setup.
+   * Set BACKEND_URL to the full URL of your Node server when deployed.
+   * Examples:
+   *   'https://your-app.railway.app'
+   *   'https://fiverupeesdreams.com'
+   * Leave as '/api/contact' for local development (npm start).
+   * When the server is unreachable the form falls back to FormSubmit.
    */
-  const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';   // e.g. 'abc123XYZ'
-  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';           // e.g. 'service_xxxxxx'
-  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';          // e.g. 'template_xxxxxx'
-  const AUTHOR_EMAIL        = 'soundfrancis@gmail.com';
+  const BACKEND_URL = '/api/contact';
 
-  const EMAILJS_READY = (
-    EMAILJS_PUBLIC_KEY  !== 'YOUR_EMAILJS_PUBLIC_KEY' &&
-    EMAILJS_SERVICE_ID  !== 'YOUR_SERVICE_ID'         &&
-    EMAILJS_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID'
-  );
-
+  /* ── DOM refs ───────────────────────────────────────────── */
   const form      = document.getElementById('contact-form');
   const submitBtn = document.getElementById('contact-submit-btn');
   const feedback  = document.getElementById('contact-feedback');
 
+  /* ── UI helpers ─────────────────────────────────────────── */
   const showFb = (msg, type) => {
     if (!feedback) return;
     feedback.textContent = msg;
     feedback.className   = 'form-feedback ' + type;
-    if (type === 'success') setTimeout(clearFb, 7000);
+    if (type === 'success') setTimeout(clearFb, 9000);
   };
 
   const clearFb = () => {
@@ -767,38 +806,79 @@ const ContactEngine = (() => {
     submitBtn.disabled = on;
   };
 
-  /* ── FormSubmit fallback (no backend, no account needed) ── */
+  /* ── Tier 1: Node/Express backend ───────────────────────── */
+  const sendViaBackend = async (name, email, message) => {
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+
+    let res;
+    try {
+      res = await fetch(BACKEND_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, email, message }),
+        signal:  ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    console.log('[ContactEngine] Backend response:', res.status);
+
+    /* 405 = server not running / wrong origin — let fallback handle it */
+    if (res.status === 405 || res.status === 404) {
+      throw Object.assign(new Error('backend_unavailable'), { fallback: true });
+    }
+
+    let data = {};
+    try { data = await res.json(); } catch (_) {}
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || `Server error ${res.status}`);
+    }
+
+    return data;
+  };
+
+  /* ── Tier 2: FormSubmit.co (no backend needed) ──────────── */
   const sendViaFormSubmit = async (name, email, message) => {
+    console.log('[ContactEngine] Using FormSubmit fallback...');
+
     const payload = new FormData();
-    payload.append('name',    name);
-    payload.append('email',   email);
-    payload.append('message', message);
+    payload.append('name',     name);
+    payload.append('email',    email);
+    payload.append('message',  message);
+    payload.append('_replyto', email);
     payload.append('_subject', `New message from ${name} — Five Rupees Dreams`);
     payload.append('_captcha', 'false');
     payload.append('_template', 'box');
 
-    const res = await fetch(`https://formsubmit.co/ajax/${AUTHOR_EMAIL}`, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: payload
-    });
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
 
-    const data = await res.json();
-    if (!res.ok || data.success !== 'true') throw new Error('FormSubmit failed');
+    let res;
+    try {
+      res = await fetch(`https://formsubmit.co/ajax/${AUTHOR_EMAIL}`, {
+        method:  'POST',
+        headers: { 'Accept': 'application/json' },
+        body:    payload,
+        signal:  ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    console.log('[ContactEngine] FormSubmit response:', res.status);
+
+    let data = {};
+    try { data = await res.json(); } catch (_) {}
+
+    if (!res.ok || data.success === false) {
+      throw new Error('FormSubmit delivery failed');
+    }
   };
 
-  /* ── EmailJS send ──────────────────────────────────────── */
-  const sendViaEmailJS = (name, email, message) => {
-    if (typeof emailjs === 'undefined') throw new Error('EmailJS not loaded');
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      from_name:  name,
-      from_email: email,
-      message:    message,
-      reply_to:   email
-    });
-  };
-
+  /* ── Form submit handler ────────────────────────────────── */
   const init = () => {
     if (!form) return;
 
@@ -810,25 +890,61 @@ const ContactEngine = (() => {
       const email   = (document.getElementById('contact-email')?.value   || '').trim();
       const message = (document.getElementById('contact-message')?.value || '').trim();
 
-      /* Validation */
-      if (!name)    { showFb('Please enter your name.',         'error'); document.getElementById('contact-name')?.focus();    return; }
+      /* Client-side validation */
+      if (!name) {
+        showFb('Please enter your name.', 'error');
+        document.getElementById('contact-name')?.focus();
+        return;
+      }
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                      showFb('Please enter a valid email.',     'error'); document.getElementById('contact-email')?.focus();   return; }
-      if (!message) { showFb('Please write a message.',         'error'); document.getElementById('contact-message')?.focus(); return; }
+        showFb('Please enter a valid email address.', 'error');
+        document.getElementById('contact-email')?.focus();
+        return;
+      }
+      if (!message) {
+        showFb('Please write a message.', 'error');
+        document.getElementById('contact-message')?.focus();
+        return;
+      }
+      if (message.length < 10) {
+        showFb('Message must be at least 10 characters.', 'error');
+        document.getElementById('contact-message')?.focus();
+        return;
+      }
 
       setLoading(true);
+      console.log('[ContactEngine] Sending... | Recipient:', AUTHOR_EMAIL);
 
       try {
-        if (EMAILJS_READY) {
-          await sendViaEmailJS(name, email, message);
-        } else {
+        /* ── Try backend first ────────────────────────────── */
+        try {
+          await sendViaBackend(name, email, message);
+          console.log('[ContactEngine] Success — delivered via backend.');
+        } catch (backendErr) {
+          /* Only fall back if backend is unreachable/405 */
+          if (!backendErr.fallback) throw backendErr;
+
+          console.log('[ContactEngine] Backend not available — trying FormSubmit...');
           await sendViaFormSubmit(name, email, message);
+          console.log('[ContactEngine] Success — delivered via FormSubmit.');
         }
+
         form.reset();
         showFb('Your message has been sent to Francis. He will be in touch soon.', 'success');
+
       } catch (err) {
-        console.error('Contact send error:', err);
-        showFb('Message could not be sent. Please email directly: soundfrancis@gmail.com', 'error');
+        const isAbort   = err.name === 'AbortError';
+        const isNetwork = err.message === 'Failed to fetch';
+
+        console.error('[ContactEngine] Failure:', err.message);
+
+        if (isAbort) {
+          showFb('Request timed out. Please check your connection and try again.', 'error');
+        } else if (isNetwork) {
+          showFb('Network error. Please email directly: ' + AUTHOR_EMAIL, 'error');
+        } else {
+          showFb(err.message || 'Message could not be sent. Please email: ' + AUTHOR_EMAIL, 'error');
+        }
       } finally {
         setLoading(false);
       }

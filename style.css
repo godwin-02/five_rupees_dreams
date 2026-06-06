@@ -528,20 +528,9 @@ html, body {
 
 .portrait-frame:hover .portrait-img { transform: scale(1.04); }
 
-/* Accent border — rendered on the column wrapper, not inside overflow:hidden frame */
-.editorial-image-col::after,
-.publisher-image-col::after {
-  content: '';
-  position: absolute;
-  bottom: -10px; right: -10px;
-  width: 65%; height: 65%;
-  border: 2px solid rgba(212,175,55,0.22);
-  border-radius: 10px;
-  pointer-events: none;
-  z-index: 0;
-}
+/* Accent border removed — was .editorial-image-col::after, .publisher-image-col::after */
 
-/* Hide the inline portrait-accent element — replaced by ::after */
+/* Hide the inline portrait-accent element */
 .portrait-accent { display: none; }
 
 /* ==========================================================================
@@ -654,19 +643,33 @@ html, body {
 
 .book-3d {
   position: relative;
-  width: clamp(180px, 22vw, 260px);
+  width: clamp(220px, 28vw, 340px);
   aspect-ratio: 2/3;
   transform-style: preserve-3d;
   transform: rotateY(-18deg) rotateX(5deg);
-  transition: transform 1s var(--ease-lux);
+  transition: transform 1s var(--ease-lux), box-shadow 1s var(--ease-lux);
   border-radius: 0 5px 5px 0;
   box-shadow:
     12px 18px 40px rgba(0,0,0,0.22),
-    4px 6px 12px rgba(0,0,0,0.12);
+    4px 6px 12px rgba(0,0,0,0.12),
+    0 0 60px rgba(181,137,24,0.10),
+    0 0 120px rgba(181,137,24,0.05);
+  animation: bookFloat 4s ease-in-out infinite;
+}
+
+@keyframes bookFloat {
+  0%, 100% { transform: rotateY(-18deg) rotateX(5deg) translateY(0);   }
+  50%       { transform: rotateY(-18deg) rotateX(5deg) translateY(-10px); }
 }
 
 .book-stage:hover .book-3d {
-  transform: rotateY(-5deg) rotateX(2deg);
+  transform: rotateY(-5deg) rotateX(2deg) translateY(-6px);
+  animation-play-state: paused;
+  box-shadow:
+    18px 28px 55px rgba(0,0,0,0.28),
+    6px 10px 18px rgba(0,0,0,0.14),
+    0 0 80px rgba(181,137,24,0.18),
+    0 0 160px rgba(181,137,24,0.08);
 }
 
 .book-front-img {
@@ -981,19 +984,7 @@ html, body {
 }
 
 /* Counter */
-.gallery-counter {
-  position: absolute;
-  top: 14px; right: 18px;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(8px);
-  color: rgba(255,255,255,0.85);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  padding: 5px 12px;
-  border-radius: 20px;
-  z-index: 10;
-}
+.gallery-counter { display: none; }
 
 /* ==========================================================================
    REVIEWS SECTION
@@ -1299,7 +1290,8 @@ html, body {
    ========================================================================== */
 .publisher-section { background: var(--canvas); }
 
-.publisher-card { overflow: visible; }
+.publisher-card,
+.author-card { overflow: visible; }
 
 .publisher-split {
   display: grid;
@@ -1312,6 +1304,22 @@ html, body {
    CONTACT SECTION
    ========================================================================== */
 .contact-section { background: var(--surface); }
+
+/* Two equal-weight cards sitting side by side */
+.contact-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  align-items: start;
+}
+
+/* Both cards match height visually */
+.contact-author-card,
+.contact-form-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .contact-form-card { }
 
@@ -1548,6 +1556,8 @@ html, body {
   .hero-content { max-width: 100%; order: 2; }
   .hero-visual  { order: 1; }
 
+  .book-3d { width: clamp(200px, 42vw, 300px); }
+
   .hero-cta-group { justify-content: center; }
 
   .hero-quote {
@@ -1587,6 +1597,7 @@ html, body {
   }
 
   .contact-split { grid-template-columns: 1fr; gap: 2.5rem; }
+  .contact-cards-grid { grid-template-columns: 1fr; gap: 2rem; }
 }
 
 /* ==========================================================================
@@ -1671,7 +1682,7 @@ html, body {
 
   .hero-cta-group { gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
 
-  .book-3d { width: clamp(130px, 38vw, 180px); }
+  .book-3d { width: clamp(200px, 72vw, 300px); }
   .hero-scroll-cue { display: none; }
 
   /* Cards */
@@ -1713,6 +1724,7 @@ html, body {
 
   /* Contact */
   .contact-split    { grid-template-columns: 1fr; gap: 2rem; }
+  .contact-cards-grid { grid-template-columns: 1fr; gap: 1.5rem; }
   .contact-form-card { padding: 1.5rem 1.25rem; }
   .social-block     { margin-top: 2rem; padding-top: 1.5rem; }
 
