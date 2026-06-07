@@ -1000,6 +1000,178 @@ const UtilEngine = (() => {
 })();
 
 /* ============================================================
+   8. MOBILE CAROUSEL ENGINE
+   ============================================================
+   Shared factory that powers both the Endorsements carousel
+   and the Media carousel on screens < 768px.
+   On desktop (≥ 768px) the engine is dormant — the sections
+   remain static CSS grids.
+   Supports: touch swipe, mouse drag, dot navigation.
+   ============================================================ */
+const MobileCarouselEngine = (() => {
+
+  const MOBILE_BP = 768; /* breakpoint in px */
+
+  /**
+   * buildCarousel(config)
+   * @param {object} config
+   *   trackId   — id of the flex/grid track element
+   *   dotsId    — id of the dots container
+   *   outerEl   — the overflow:hidden outer wrapper element
+   *   itemSel   — CSS selector for individual slide items inside the track
+   */
+  const buildCarousel = ({ trackId, dotsId, outerEl, itemSel }) => {
+
+    const track   = document.getElementById(trackId);
+    const dotsWrap = document.getElementById(dotsId);
+    if (!track || !dotsWrap || !outerEl) return;
+
+    let current    = 0;
+    let isAnimating = false;
+    let dragStart  = 0;
+    let isDragging = false;
+
+    /* ── Collect slides ── */
+    const getSlides = () => Array.from(track.querySelectorAll(itemSel));
+
+    /* ── Build dots ── */
+    const buildDots = (slides) => {
+      dotsWrap.innerHTML = '';
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'm-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Slide ${i + 1}`);
+        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        dot.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(dot);
+      });
+    };
+
+    /* ── Update dot state ── */
+    const updateDots = (slides) => {
+      const dots = dotsWrap.querySelectorAll('.m-dot');
+      dots.forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+        d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+      });
+      /* aria-live region: announce current slide */
+      track.setAttribute('aria-label', `Slide ${current + 1} of ${slides.length}`);
+    };
+
+    /* ── Apply translateX ── */
+    const applyTransform = () => {
+      track.style.transform = `translateX(-${current * 100}%)`;
+    };
+
+    /* ── Navigate ── */
+    const goTo = (index) => {
+      const slides = getSlides();
+      if (isAnimating || index === current) return;
+      isAnimating = true;
+      current = (index + slides.length) % slides.length;
+      applyTransform();
+      updateDots(slides);
+      setTimeout(() => { isAnimating = false; }, 470);
+    };
+
+    const next = () => { const s = getSlides(); goTo((current + 1) % s.length); };
+    const prev = () => { const s = getSlides(); goTo((current - 1 + s.length) % s.length); };
+
+    /* ── Drag / touch ── */
+    const onDragStart = (x) => { dragStart = x; isDragging = true; };
+    const onDragEnd   = (x) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const delta = dragStart - x;
+      if (Math.abs(delta) > 50) { delta > 0 ? next() : prev(); }
+    };
+
+    const bindDrag = () => {
+      outerEl.addEventListener('touchstart', e => onDragStart(e.changedTouches[0].clientX), { passive: true });
+      outerEl.addEventListener('touchend',   e => onDragEnd(e.changedTouches[0].clientX),   { passive: true });
+      outerEl.addEventListener('mousedown',  e => { e.preventDefault(); onDragStart(e.clientX); });
+      window.addEventListener ('mouseup',   e => onDragEnd(e.clientX));
+      outerEl.style.cursor = 'grab';
+      outerEl.addEventListener('mousedown', () => { outerEl.style.cursor = 'grabbing'; });
+      window.addEventListener ('mouseup',  () => { outerEl.style.cursor = 'grab'; });
+    };
+
+    /* ── Activate (mobile) ── */
+    const activate = () => {
+      const slides = getSlides();
+      if (!slides.length) return;
+      current = 0;
+      buildDots(slides);
+      updateDots(slides);
+      applyTransform();
+      bindDrag();
+      dotsWrap.setAttribute('aria-hidden', 'false');
+    };
+
+    /* ── Deactivate (desktop) ── */
+    const deactivate = () => {
+      track.style.transform = '';
+      dotsWrap.innerHTML    = '';
+      dotsWrap.setAttribute('aria-hidden', 'true');
+      outerEl.style.cursor  = '';
+      current = 0;
+    };
+
+    return { activate, deactivate };
+  };
+
+  /* ── Media-query driven init / teardown ── */
+  const init = () => {
+
+    const endorsementsOuter = document.getElementById('endorsements-carousel-outer');
+    const mediaOuter        = document.getElementById('media-carousel-outer');
+
+    if (!endorsementsOuter && !mediaOuter) return;
+
+    const endorsementsCtrl = endorsementsOuter ? buildCarousel({
+      trackId:  'endorsements-track',
+      dotsId:   'endorsements-dots',
+      outerEl:  endorsementsOuter,
+      itemSel:  '.endorsement-card',
+    }) : null;
+
+    const mediaCtrl = mediaOuter ? buildCarousel({
+      trackId:  'media-track',
+      dotsId:   'media-dots',
+      outerEl:  mediaOuter,
+      itemSel:  '.media-card',
+    }) : null;
+
+    let mobileActive = false;
+
+    const toggle = () => {
+      const isMobile = window.innerWidth < MOBILE_BP;
+      if (isMobile && !mobileActive) {
+        endorsementsCtrl && endorsementsCtrl.activate();
+        mediaCtrl        && mediaCtrl.activate();
+        mobileActive = true;
+      } else if (!isMobile && mobileActive) {
+        endorsementsCtrl && endorsementsCtrl.deactivate();
+        mediaCtrl        && mediaCtrl.deactivate();
+        mobileActive = false;
+      }
+    };
+
+    /* Run once immediately, then on resize */
+    toggle();
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(toggle, 200);
+    }, { passive: true });
+  };
+
+  return { init };
+})();
+
+/* ============================================================
    BOOTSTRAP ALL MODULES
    ============================================================ */
 NavEngine.init();
@@ -1008,5 +1180,6 @@ QuotesEngine.init();
 ReviewEngine.init();
 ContactEngine.init();
 UtilEngine.init();
+MobileCarouselEngine.init();
 
 }); /* end DOMContentLoaded */
