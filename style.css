@@ -975,13 +975,28 @@ html, body {
 .gallery-prev { left: clamp(12px, 3vw, 22px); }
 .gallery-next { right: clamp(12px, 3vw, 22px); }
 
-/* Dots */
+/* Dots — repositioned BELOW image viewport, not overlapping */
 .gallery-dots {
-  position: absolute;
-  bottom: 14px; left: 50%;
-  transform: translateX(-50%);
-  display: flex; gap: 6px;
+  position: relative;   /* pull out of absolute stacking on mobile */
+  bottom: auto;
+  left: auto;
+  transform: none;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
   z-index: 10;
+  padding: 10px 0 4px;
+}
+
+/* Re-apply absolute only on desktop where there's room inside the frame */
+@media (min-width: 769px) {
+  .gallery-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0;
+  }
 }
 
 .gallery-dot {
@@ -3110,14 +3125,11 @@ html, body {
 
 /* ── Global tap target minimum (WCAG 2.5.5) ── */
 @media (max-width: 768px) {
+  /* Buttons and interactive controls only — NOT dot indicators */
   .btn,
-  .gallery-dot,
-  .reviews-dot,
-  .quote-dot,
   .gallery-arrow,
   .reviews-arrow,
   .social-icon-link,
-  .nav-links a,
   .review-crud-btn {
     min-height: 44px;
     min-width: 44px;
@@ -3130,18 +3142,46 @@ html, body {
     min-width: unset;
   }
 
-  /* Quote dots — easier tap */
-  .quote-dot {
-    width: 12px;
-    height: 12px;
+  /* ── INDICATOR NORMALIZATION ──
+     Compact dots on mobile — no oversizing, no tap-target inflation.
+     Wrap each dot in a larger transparent hit-area via padding instead. */
+  .gallery-dot,
+  .reviews-dot,
+  .quote-dot,
+  .mobile-carousel-dots .m-dot {
+    /* Reset any previously inflated values */
+    width: 8px !important;
+    height: 8px !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    padding: 4px;          /* invisible hit-area expansion */
+    background-clip: content-box;
+    box-sizing: content-box;
+    border-radius: 50%;
+    transition: width 0.3s ease, border-radius 0.3s ease,
+                background 0.3s ease, transform 0.2s ease;
+    transform: none !important; /* kill scale() inflation */
   }
 
-  /* Better gallery dot tap targets */
-  .gallery-dot,
-  .reviews-dot {
-    padding: 6px;
-    width: auto;
-    height: auto;
+  /* Active: elegant capsule */
+  .gallery-dot.active,
+  .reviews-dot.active,
+  .quote-dot.active,
+  .mobile-carousel-dots .m-dot.active {
+    width: 16px !important;
+    height: 8px !important;
+    border-radius: 999px !important;
+    transform: none !important;
+  }
+
+  /* Dot container spacing — prevent collision with content */
+  .gallery-dots,
+  .reviews-dots,
+  .quote-nav,
+  .mobile-carousel-dots {
+    margin-top: 10px;
+    padding-bottom: 4px;
+    gap: 4px;
   }
 
   /* Author section: stack highlight items to 1 column on small screens */
@@ -3545,3 +3585,395 @@ html, body {
 
 /* Hide old standalone featured-logo-strip if it somehow remains */
 .featured-logo-strip { display: none !important; }
+
+/* ==========================================================================
+   PRODUCTION MOBILE RESPONSIVENESS PATCH
+   Senior Front-End Architecture — Non-Destructive
+   ========================================================================== */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   1. INDICATOR SCALING — Global normalization across all breakpoints
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Desktop baseline: dots already sized correctly, reinforce clean state */
+.gallery-dot,
+.reviews-dot,
+.quote-dot,
+.mobile-carousel-dots .m-dot {
+  transition: width 0.3s ease, height 0.3s ease,
+              border-radius 0.3s ease, background 0.3s ease,
+              transform 0.25s ease;
+}
+
+/* Active state: capsule shape (desktop) */
+.gallery-dot.active {
+  background: var(--gold-mid);
+  width: 18px;
+  height: 7px;
+  border-radius: 999px;
+  transform: none; /* replace scale() with shape change */
+}
+
+.reviews-dot.active {
+  background: var(--gold-hi);
+  width: 18px;
+  height: 8px;
+  border-radius: 999px;
+  transform: none;
+}
+
+.quote-dot.active {
+  background: var(--gold-hi);
+  width: 18px;
+  height: 8px;
+  border-radius: 999px;
+  transform: none;
+}
+
+.mobile-carousel-dots .m-dot.active {
+  background: var(--gold-hi);
+  width: 18px;
+  height: 8px;
+  border-radius: 999px;
+  transform: none;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   2. GALLERY SAFE-ZONE — dots below image, not overlapping faces
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* On mobile: let gallery-viewport overflow visible at bottom so dots show */
+@media (max-width: 768px) {
+  .gallery-section {
+    overflow: visible; /* allow dots to sit below viewport */
+  }
+
+  .gallery-viewport {
+    overflow: visible;         /* dots flow below frame */
+    border-radius: 10px;
+  }
+
+  /* Clip only the image track, not the dot row */
+  .gallery-track {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* Dots: sit below image, centered, no overlap */
+  .gallery-dots {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin-top: 12px;
+    padding-bottom: 4px;
+    justify-content: center;
+    display: flex;
+    gap: 6px;
+  }
+
+  /* Gallery dot size — compact, capsule active */
+  .gallery-dot {
+    width: 8px !important;
+    height: 8px !important;
+    padding: 4px;
+    background-clip: content-box;
+    box-sizing: content-box;
+    background: rgba(17,22,34,0.35); /* dark on light bg now */
+    border: 1px solid rgba(212,175,55,0.3);
+    min-width: unset !important;
+    min-height: unset !important;
+    transform: none !important;
+  }
+
+  .gallery-dot.active {
+    width: 18px !important;
+    height: 8px !important;
+    border-radius: 999px !important;
+    background: var(--gold-hi) !important;
+    border-color: var(--gold-hi) !important;
+    transform: none !important;
+  }
+
+  /* Caption: keep readable, never overlap dot row */
+  .gallery-caption {
+    padding: 2.5rem 1.25rem 1.5rem;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .gallery-caption h5 {
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    margin-bottom: 0.25rem;
+  }
+
+  .gallery-caption p {
+    font-size: clamp(0.72rem, 2.8vw, 0.88rem);
+    line-height: 1.45;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   3. EXCERPTS & QUOTE CONTAINMENT — vertical separation on small screens
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Card: flex-column, proper separation */
+  .excerpts-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1.1rem 1.25rem;
+  }
+
+  /* Carousel: no clipping, auto height */
+  .excerpts-card .quotes-carousel {
+    min-height: unset;
+    height: auto;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  /* Quote text: comfortable reading */
+  .excerpts-card .quote-text {
+    font-size: clamp(0.95rem, 4vw, 1.1rem);
+    line-height: 1.7;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Dot nav: centered, below text, never overlapping */
+  .excerpts-card .quote-nav {
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0.75rem;
+    padding-bottom: 4px;
+  }
+
+  /* Quote dots */
+  .excerpts-card .quote-dot,
+  .quote-dot {
+    width: 8px !important;
+    height: 8px !important;
+    padding: 4px;
+    background-clip: content-box;
+    box-sizing: content-box;
+    min-width: unset !important;
+    min-height: unset !important;
+    transform: none !important;
+  }
+
+  .excerpts-card .quote-dot.active,
+  .quote-dot.active {
+    width: 18px !important;
+    height: 8px !important;
+    border-radius: 999px !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .excerpts-card {
+    padding: 1.25rem 0.95rem 1rem;
+    border-left-width: 3px;
+  }
+
+  .excerpts-card .quotes-carousel {
+    margin-bottom: 1rem;
+  }
+
+  .excerpts-card .quote-text {
+    font-size: clamp(0.9rem, 4.5vw, 1rem);
+    line-height: 1.65;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   4. REVIEWS DOT CONTAINMENT
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .reviews-dots {
+    gap: 6px;
+    margin-top: 10px;
+    padding-bottom: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .reviews-dot {
+    width: 8px !important;
+    height: 8px !important;
+    padding: 4px;
+    background-clip: content-box;
+    box-sizing: content-box;
+    min-width: unset !important;
+    min-height: unset !important;
+    transform: none !important;
+  }
+
+  .reviews-dot.active {
+    width: 18px !important;
+    height: 8px !important;
+    border-radius: 999px !important;
+    transform: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   5. MOBILE CAROUSEL DOTS (endorsements / media)
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .mobile-carousel-dots {
+    gap: 6px;
+    margin-top: 10px;
+    padding-bottom: 4px;
+  }
+
+  .mobile-carousel-dots .m-dot {
+    width: 8px !important;
+    height: 8px !important;
+    padding: 4px;
+    background-clip: content-box;
+    box-sizing: content-box;
+    min-width: unset !important;
+    min-height: unset !important;
+    transform: none !important;
+  }
+
+  .mobile-carousel-dots .m-dot.active {
+    width: 18px !important;
+    height: 8px !important;
+    border-radius: 999px !important;
+    background: var(--gold-hi) !important;
+    transform: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   6. SPEAKING / EVENT SECTION STABILITY
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .speaking-section,
+  .speaking-cta-box {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .speaking-cta-box {
+    padding: 2rem 1.25rem;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .speaking-cta-title {
+    font-size: clamp(1.2rem, 5vw, 1.55rem);
+    word-break: break-word;
+  }
+
+  .speaking-cta-desc {
+    font-size: clamp(0.88rem, 3.5vw, 1rem);
+    max-width: 100%;
+  }
+
+  .speaking-cta-box .btn-primary {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+    padding: 14px 18px;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .speaking-cta-box {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   7. GLOBAL RESPONSIVE SAFETY PATCH
+   No horizontal bleed, overflow, or layout instability
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Hard stop on all potential overflow sources */
+.container,
+.luxury-card,
+.author-card,
+.publisher-card,
+.contact-author-card,
+.contact-form-card,
+.review-form-wrapper,
+.endorsement-card,
+.speaking-cta-box,
+.excerpts-card,
+.excerpts-inner,
+.reviews-carousel-wrapper,
+.reviews-track-container {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Text never breaks viewport */
+.hero-title,
+.section-title,
+.card-title,
+.speaking-cta-title,
+.endorsement-text,
+.review-text,
+.excerpt-text,
+.quote-text,
+.body-text p,
+.body-text-secondary,
+.info-value,
+.info-link {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Images never overflow */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Breakpoint: 320px — extreme small device ── */
+@media (max-width: 320px) {
+  .container { padding: 0 0.75rem; }
+  .luxury-card { padding: 1rem 0.75rem; }
+  .btn { padding: 0.8rem 1.1rem; font-size: 0.68rem; }
+  .hero-title { font-size: 1.5rem; }
+  .section-title { font-size: 1.45rem; }
+  .speaking-cta-box { padding: 1.25rem 0.875rem; }
+  .excerpts-card { padding: 1.1rem 0.8rem; }
+  .gallery-dot, .reviews-dot, .quote-dot {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  .gallery-dot.active,
+  .reviews-dot.active,
+  .quote-dot.active {
+    width: 14px !important;
+    height: 6px !important;
+  }
+}
+
+/* ── Prevent viewport shake / horizontal scroll globally ── */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Prevent any flex child from exceeding its container */
+  .hero-container > *,
+  .publisher-split > *,
+  .contact-cards-grid > * {
+    min-width: 0;
+  }
+}
