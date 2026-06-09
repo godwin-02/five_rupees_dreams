@@ -233,11 +233,16 @@ html, body {
 }
 
 .nav-logo-img {
-  height: clamp(38px, 5vw, 50px);
-  width: auto;
+  height: clamp(64px, 7.5vw, 88px);
+  width:  clamp(64px, 7.5vw, 88px);
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 50%;
   transition: transform 0.4s var(--ease-lux);
+  /* Premium sharpening — keeps coin text readable at all sizes */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  filter: contrast(1.15) saturate(1.08) brightness(1.02);
+  flex-shrink: 0;
 }
 
 .nav-logo:hover .nav-logo-img { transform: scale(1.06); }
@@ -249,6 +254,12 @@ html, body {
   color: var(--text-primary);
   white-space: nowrap;
   transition: color 0.3s;
+}
+
+.nav-logo-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .nav-logo:hover .nav-logo-text { color: var(--gold-hi); }
@@ -534,17 +545,22 @@ html, body {
 .portrait-accent { display: none; }
 
 /* ==========================================================================
-   SCROLL REVEAL
+   SCROLL REVEAL — Infosys-style premium motion
    ========================================================================== */
 [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s var(--ease-lux), transform 0.9s var(--ease-lux);
+  transform: translateY(60px);
+  transition: opacity 1.0s ease-out, transform 1.0s ease-out;
 }
 
 [data-reveal].revealed {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Children of revealed sections — reset so they don't double-animate */
+[data-reveal].revealed > * {
+  /* handled by stagger below; no extra rule needed */
 }
 
 /* ==========================================================================
@@ -573,11 +589,11 @@ html, body {
 
 .hero-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 5vw, 6rem);
+  grid-template-columns: 1fr 2fr 1.4fr;
+  gap: clamp(1.5rem, 3.5vw, 4rem);
   align-items: center;
-  padding-top: clamp(2rem, 5vw, 4rem);
-  padding-bottom: clamp(3rem, 6vw, 5rem);
+  padding-top: clamp(0.75rem, 2vw, 1.5rem);
+  padding-bottom: clamp(2rem, 5vw, 4rem);
   width: 100%;
 }
 
@@ -1682,7 +1698,7 @@ html, body {
 
   .hero-cta-group { gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
 
-  .book-3d { width: clamp(200px, 72vw, 300px); }
+  .book-3d { width: clamp(240px, 74vw, 340px); }
   .hero-scroll-cue { display: none; }
 
   /* Cards */
@@ -1761,7 +1777,7 @@ html, body {
   }
   .hero-cta-group .btn { width: 100%; justify-content: center; }
 
-  .book-3d { width: clamp(110px, 35vw, 155px); }
+  .book-3d { width: clamp(180px, 62vw, 260px); }
 
   .gallery-arrow { display: none; }
   .gallery-track { height: clamp(220px, 65vw, 300px); }
@@ -1792,9 +1808,9 @@ html, body {
 @media (max-width: 360px) {
   .container    { padding: 0 0.875rem; }
   .hero-title   { font-size: 1.6rem; }
-  .nav-logo-img { height: 36px; }
+  .nav-logo-img { height: clamp(52px, 8vw, 64px); width: clamp(52px, 8vw, 64px); }
   .luxury-card  { padding: 1.1rem 0.9rem; }
-  .book-3d      { width: 105px; }
+  .book-3d      { width: clamp(160px, 60vw, 220px); }
   .info-icon    { width: 36px; height: 36px; font-size: 0.8rem; }
   .info-link    { font-size: 0.78rem; }
 }
@@ -1879,7 +1895,7 @@ html, body {
 
 /* Upgraded 3D book — larger on desktop */
 .book-showcase .book-3d {
-  width: clamp(240px, 30vw, 380px);
+  width: clamp(300px, 40vw, 520px);
 }
 
 /* Floating badge */
@@ -1919,6 +1935,18 @@ html, body {
    AUTHOR SECTION ENHANCEMENTS
    ========================================================================== */
 
+/* Publisher logo */
+.publisher-logo {
+  display: block;
+  max-width: 280px;
+  max-height: 130px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 1.25rem;
+  border-radius: 6px;
+}
+
 /* Role tags */
 .author-roles {
   display: flex;
@@ -1932,22 +1960,24 @@ html, body {
   align-items: center;
   gap: 0.4rem;
   padding: 0.4rem 0.9rem;
-  background: var(--gold-soft);
-  border: 1px solid var(--gold-divider);
+  background: #F6F0E1;
+  border: 1px solid rgba(212,175,55,0.35);
   border-radius: 50px;
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--gold-hi);
-  transition: background 0.3s, border-color 0.3s;
+  box-shadow: 0 1px 4px rgba(180,140,40,0.10);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .role-tag i { font-size: 0.7rem; }
 
 .role-tag:hover {
-  background: rgba(212,175,55,0.14);
+  background: #EFE7D5;
   border-color: var(--gold-hi);
+  box-shadow: 0 2px 10px rgba(180,140,40,0.18);
 }
 
 /* Author highlights list */
@@ -2418,7 +2448,7 @@ html, body {
   }
 
   .book-showcase .book-3d {
-    width: clamp(220px, 40vw, 300px);
+    width: clamp(260px, 50vw, 380px);
   }
 
   .book-badge {
@@ -2657,3 +2687,861 @@ html, body {
   .endorsements-grid  { grid-template-columns: unset; }
   .media-grid         { grid-template-columns: unset; }
 }
+
+/* ==========================================================================
+   TASK 2 — NAV LOGO: author name below logo in hero context
+   ========================================================================== */
+.nav-logo-author-name {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: clamp(0.6rem, 1.2vw, 0.78rem);
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  line-height: 1.2;
+  margin-top: 2px;
+  transition: color 0.3s;
+}
+
+.nav-logo:hover .nav-logo-author-name { color: var(--gold-hi); }
+
+@media (max-width: 768px) {
+  .nav-logo-author-name { display: none; }
+}
+
+/* ==========================================================================
+   TASK 3 — EXCERPTS FROM THE BOOK: premium section layout
+   ========================================================================== */
+.excerpts-section {
+  background: var(--surface);
+  padding: clamp(4rem, 8vw, 7rem) 0;
+}
+
+.excerpts-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 2.5rem);
+}
+
+.excerpts-header {
+  text-align: center;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.excerpts-header .eyebrow {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.excerpts-header .section-title {
+  margin-bottom: 0;
+}
+
+/* The card itself — premium gold-left-border styling preserved */
+.excerpts-card {
+  background: var(--card);
+  border: 1px solid var(--gold-divider);
+  border-left: 4px solid var(--gold-hi);
+  border-radius: 14px;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  box-shadow: 0 8px 40px var(--gold-soft);
+  overflow: hidden;
+  /* Ensure quote text never overflows */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Quotes carousel inside the card */
+.excerpts-card .quotes-carousel {
+  min-height: 180px;
+  margin-bottom: 1.5rem;
+}
+
+.excerpts-card .quote-text {
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Dot nav — centred */
+.excerpts-card .quote-nav {
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.excerpts-card .quote-dot {
+  width: 9px;
+  height: 9px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .excerpts-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .excerpts-card .quotes-carousel {
+    min-height: 150px;
+  }
+
+  .excerpts-card .quote-text {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 480px) {
+  .excerpts-card .quotes-carousel {
+    min-height: 130px;
+  }
+
+  .excerpts-card .quote-text {
+    font-size: clamp(0.95rem, 4.5vw, 1.1rem);
+  }
+}
+
+/* ==========================================================================
+   TASK 2 — ENHANCED SCROLL REVEALS
+   Staggered children, direction variants, scale reveals
+   ========================================================================== */
+
+/* ==========================================================================
+   TASK 2 — ENHANCED SCROLL REVEALS
+   Staggered children, direction variants, scale reveals
+   ========================================================================== */
+
+/* Direction variants */
+[data-reveal="left"] {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+[data-reveal="right"] {
+  opacity: 0;
+  transform: translateX(40px);
+}
+[data-reveal="scale"] {
+  opacity: 0;
+  transform: scale(0.96) translateY(24px);
+}
+[data-reveal="left"].revealed,
+[data-reveal="right"].revealed,
+[data-reveal="scale"].revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Base state for ALL staggered children ── */
+.endorsements-grid .endorsement-card,
+.media-grid .media-card,
+.speaking-topics-grid .speaking-topic-card,
+.contact-cards-grid .luxury-card,
+.reviews-track .review-node,
+.author-highlights .author-highlight-item {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.95s ease-out, transform 0.95s ease-out;
+}
+
+/* ── Endorsement cards ── */
+.endorsements-grid.stagger-revealed .endorsement-card:nth-child(1) { transition-delay: 0.04s; }
+.endorsements-grid.stagger-revealed .endorsement-card:nth-child(2) { transition-delay: 0.16s; }
+.endorsements-grid.stagger-revealed .endorsement-card:nth-child(3) { transition-delay: 0.28s; }
+.endorsements-grid.stagger-revealed .endorsement-card:nth-child(4) { transition-delay: 0.40s; }
+
+.endorsements-grid.stagger-revealed .endorsement-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Media cards ── */
+.media-grid.stagger-revealed .media-card:nth-child(1) { transition-delay: 0.04s; }
+.media-grid.stagger-revealed .media-card:nth-child(2) { transition-delay: 0.14s; }
+.media-grid.stagger-revealed .media-card:nth-child(3) { transition-delay: 0.24s; }
+.media-grid.stagger-revealed .media-card:nth-child(4) { transition-delay: 0.34s; }
+
+.media-grid.stagger-revealed .media-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Speaking topic cards ── */
+.speaking-topics-grid.stagger-revealed .speaking-topic-card:nth-child(1) { transition-delay: 0.04s; }
+.speaking-topics-grid.stagger-revealed .speaking-topic-card:nth-child(2) { transition-delay: 0.14s; }
+.speaking-topics-grid.stagger-revealed .speaking-topic-card:nth-child(3) { transition-delay: 0.24s; }
+.speaking-topics-grid.stagger-revealed .speaking-topic-card:nth-child(4) { transition-delay: 0.34s; }
+
+.speaking-topics-grid.stagger-revealed .speaking-topic-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Author highlights ── */
+.author-highlights .author-highlight-item {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.85s ease-out, transform 0.85s ease-out;
+}
+.author-highlights.stagger-revealed .author-highlight-item:nth-child(1) { transition-delay: 0.06s; }
+.author-highlights.stagger-revealed .author-highlight-item:nth-child(2) { transition-delay: 0.17s; }
+.author-highlights.stagger-revealed .author-highlight-item:nth-child(3) { transition-delay: 0.28s; }
+.author-highlights.stagger-revealed .author-highlight-item:nth-child(4) { transition-delay: 0.39s; }
+.author-highlights.stagger-revealed .author-highlight-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Contact grid cards ── */
+.contact-cards-grid.stagger-revealed .luxury-card:nth-child(1) { transition-delay: 0.06s; }
+.contact-cards-grid.stagger-revealed .luxury-card:nth-child(2) { transition-delay: 0.20s; }
+.contact-cards-grid.stagger-revealed .luxury-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Respect reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .endorsements-grid .endorsement-card,
+  .media-grid .media-card,
+  .speaking-topics-grid .speaking-topic-card,
+  .contact-cards-grid .luxury-card,
+  .author-highlights .author-highlight-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   TASK 3 — GLASSMORPHISM (subtle, premium, theme-matched)
+   ========================================================================== */
+
+/* Endorsement cards — glass on light surface */
+.endorsement-card.luxury-card {
+  background: rgba(248, 250, 252, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212,175,55,0.22);
+  box-shadow:
+    0 4px 24px rgba(212,175,55,0.07),
+    0 1px 0 rgba(255,255,255,0.8) inset;
+  transition: background 0.4s var(--ease-lux),
+              border-color 0.4s var(--ease-lux),
+              box-shadow 0.4s var(--ease-lux),
+              transform 0.4s var(--ease-lux);
+}
+
+@media (hover: hover) {
+  .endorsement-card.luxury-card:hover {
+    background: rgba(248, 250, 252, 0.92);
+    border-color: rgba(212,175,55,0.42);
+    box-shadow:
+      0 16px 44px rgba(212,175,55,0.13),
+      0 1px 0 rgba(255,255,255,0.9) inset;
+    transform: translateY(-5px);
+  }
+}
+
+/* Excerpts quote card */
+.excerpts-card {
+  background: rgba(248, 250, 252, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Review nodes */
+.review-node {
+  background: rgba(248, 250, 252, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(212,175,55,0.18);
+}
+
+/* Speaking CTA inner content glass accent line */
+.speaking-cta-box {
+  box-shadow:
+    0 0 0 1px rgba(212,175,55,0.08),
+    0 32px 64px rgba(0,0,0,0.28),
+    0 0 80px rgba(212,175,55,0.06);
+}
+
+/* ==========================================================================
+   TASK 4 — PREMIUM TOAST NOTIFICATION SYSTEM
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: clamp(16px, 4vw, 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99995;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  width: min(92vw, 480px);
+}
+
+.toast {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212,175,55,0.28);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.12),
+    0 2px 8px rgba(0,0,0,0.06),
+    0 0 0 1px rgba(255,255,255,0.6) inset;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition: opacity 0.45s var(--ease-lux),
+              transform 0.45s var(--ease-lux);
+}
+
+.toast.toast-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast.toast-hide {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+}
+
+.toast-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.toast-success .toast-icon {
+  background: rgba(212,175,55,0.12);
+  border: 1px solid rgba(212,175,55,0.3);
+  color: var(--gold-hi);
+}
+
+.toast-error .toast-icon {
+  background: rgba(192,2,26,0.07);
+  border: 1px solid rgba(192,2,26,0.2);
+  color: #c0021a;
+}
+
+.toast-info .toast-icon {
+  background: rgba(74,144,226,0.08);
+  border: 1px solid rgba(74,144,226,0.2);
+  color: #4A90E2;
+}
+
+.toast-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.toast-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.toast-msg {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.toast-success .toast-title { color: #8a6d00; }
+.toast-error   .toast-title { color: #c0021a; }
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 2px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.toast-close:hover { color: var(--text-primary); }
+
+/* Upgrade existing form-feedback to use toast-style inline */
+.form-feedback {
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.95rem 1.25rem;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+
+.form-feedback.success {
+  background: rgba(212,175,55,0.06);
+  border: 1px solid rgba(212,175,55,0.28);
+  color: #7a6000;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.form-feedback.error {
+  background: rgba(192,2,26,0.04);
+  border: 1px solid rgba(192,2,26,0.22);
+  color: #c0021a;
+}
+
+/* ==========================================================================
+   TASK 5 & 6 — RESPONSIVENESS AUDIT + MOBILE POLISH
+   ========================================================================== */
+
+/* ── Global tap target minimum (WCAG 2.5.5) ── */
+@media (max-width: 768px) {
+  .btn,
+  .gallery-dot,
+  .reviews-dot,
+  .quote-dot,
+  .gallery-arrow,
+  .reviews-arrow,
+  .social-icon-link,
+  .nav-links a,
+  .review-crud-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Inline links: relax min-width */
+  .nav-links a,
+  .review-crud-btn,
+  .info-link {
+    min-width: unset;
+  }
+
+  /* Quote dots — easier tap */
+  .quote-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Better gallery dot tap targets */
+  .gallery-dot,
+  .reviews-dot {
+    padding: 6px;
+    width: auto;
+    height: auto;
+  }
+
+  /* Author section: stack highlight items to 1 column on small screens */
+  .author-highlights {
+    grid-template-columns: 1fr;
+  }
+
+  /* Publisher logo: scale down gracefully */
+  .publisher-logo {
+    max-width: 200px;
+    max-height: 90px;
+  }
+
+  /* Contact form: full-width inputs */
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    font-size: 16px; /* prevent iOS auto-zoom */
+  }
+
+  /* Speaking section: full-width CTA */
+  .speaking-cta-box {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Toast: adjust for small screens */
+  .toast-container {
+    bottom: 12px;
+    width: min(96vw, 480px);
+  }
+
+  /* Endorsement grid: already handled, ensure card padding is comfortable */
+  .endorsement-card {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Form buttons full width */
+  #contact-form .btn,
+  #review-form .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Publisher logo */
+  .publisher-logo {
+    max-width: 160px;
+    max-height: 72px;
+  }
+
+  /* Speaking CTA */
+  .speaking-cta-box {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Better spacing for info items on tiny screens */
+  .info-item {
+    gap: 0.85rem;
+  }
+
+  /* Stagger grids: reset to single columns if needed */
+  .endorsements-grid,
+  .speaking-topics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Landscape mobile — prevent excessive height on short screens */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-section {
+    min-height: auto;
+  }
+
+  .hero-container {
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+/* ==========================================================================
+   TASK 1 — TEXT-ONLY NAV LOGO (no image, no subtitle)
+   ========================================================================== */
+.nav-logo-text-only {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.nav-logo-text-only .nav-logo-text {
+  display: inline !important; /* always visible, not hidden on mobile */
+  font-family: var(--font-serif);
+  font-size: clamp(0.72rem, 1.6vw, 1rem);
+  letter-spacing: 0.22em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  transition: color 0.3s;
+  font-weight: 400;
+}
+
+.nav-logo-text-only:hover .nav-logo-text {
+  color: var(--gold-hi);
+}
+
+/* Hide old logo image and subtitle everywhere — not used any more */
+.nav-logo-img   { display: none !important; }
+.nav-logo-author-name { display: none !important; }
+
+/* ==========================================================================
+   TASK 2 — FEATURED LOGO IMAGE STRIP (below nav, above hero)
+   ========================================================================== */
+.featured-logo-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(0.75rem, 2vw, 1.25rem) 1rem clamp(0.5rem, 1.5vw, 1rem);
+  margin-top: var(--nav-h);
+  background: var(--canvas);
+}
+
+.featured-logo-img {
+  width: clamp(100px, 14vw, 200px);
+  height: auto;
+  object-fit: contain;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  filter: none;
+  /* Premium drop shadow */
+  filter: drop-shadow(0 4px 18px rgba(212,175,55,0.18)) drop-shadow(0 1px 4px rgba(0,0,0,0.08));
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1),
+              filter 0.5s cubic-bezier(0.16,1,0.3,1);
+  border-radius: 50%; /* logo.png is a coin — keep it circular */
+}
+
+.featured-logo-img:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 8px 28px rgba(212,175,55,0.30)) drop-shadow(0 2px 6px rgba(0,0,0,0.10));
+}
+
+@media (max-width: 768px) {
+  .featured-logo-img {
+    width: clamp(100px, 22vw, 160px);
+  }
+  .featured-logo-strip {
+    padding: 0.75rem 1rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured-logo-img {
+    width: clamp(90px, 26vw, 130px);
+  }
+}
+
+@media (max-width: 360px) {
+  .featured-logo-img {
+    width: clamp(80px, 28vw, 110px);
+  }
+}
+
+/* ==========================================================================
+   TASK 3 — BOOK COVER PROMINENCE
+   ========================================================================== */
+
+/* Desktop: significantly larger book */
+.book-showcase .book-3d {
+  width: clamp(320px, 42vw, 560px);
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+  .book-showcase .book-3d {
+    width: clamp(260px, 52vw, 400px);
+  }
+}
+
+/* Mobile — much larger than before */
+@media (max-width: 768px) {
+  .book-3d {
+    width: clamp(260px, 72vw, 360px) !important;
+  }
+
+  .book-showcase .book-3d {
+    width: clamp(260px, 72vw, 360px);
+  }
+
+  /* Give hero visual more vertical room */
+  .hero-visual {
+    padding: 0.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-3d {
+    width: clamp(220px, 76vw, 300px) !important;
+  }
+  .book-showcase .book-3d {
+    width: clamp(220px, 76vw, 300px);
+  }
+}
+
+@media (max-width: 360px) {
+  .book-3d {
+    width: clamp(180px, 78vw, 240px) !important;
+  }
+  .book-showcase .book-3d {
+    width: clamp(180px, 78vw, 240px);
+  }
+}
+
+/* ==========================================================================
+   HERO BRAND COLUMN (logo + author name — left column)
+   ========================================================================== */
+.hero-brand-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-brand-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.hero-brand-logo {
+  width: clamp(100px, 11vw, 160px);
+  height: auto;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 18px rgba(212,175,55,0.20))
+          drop-shadow(0 1px 4px rgba(0,0,0,0.08));
+  transition: transform 0.5s var(--ease-lux), filter 0.5s var(--ease-lux);
+}
+
+.hero-brand-logo:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 8px 28px rgba(212,175,55,0.32))
+          drop-shadow(0 2px 6px rgba(0,0,0,0.10));
+}
+
+.hero-brand-name {
+  font-family: var(--font-serif);
+  font-size: clamp(0.85rem, 1.2vw, 1.1rem);
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+}
+
+.hero-brand-role {
+  font-size: clamp(0.62rem, 0.9vw, 0.75rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold-hi);
+  line-height: 1;
+}
+
+/* ── Thin divider below brand col on large screens ── */
+.hero-brand-inner::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--gold-divider);
+  margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   HERO RESPONSIVE — tablet & mobile
+   ========================================================================== */
+
+/* Tablet (992px): collapse to 2-col — brand col hides, text + book remain */
+@media (max-width: 992px) {
+  .hero-container {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    text-align: center;
+  }
+
+  /* Brand col moves above both columns */
+  .hero-brand-col {
+    grid-column: 1 / -1;
+    order: -1;
+    padding-bottom: 0.5rem;
+  }
+
+  .hero-brand-logo { width: clamp(80px, 14vw, 120px); }
+
+  .hero-brand-name { font-size: clamp(0.82rem, 2vw, 1rem); }
+
+  .hero-content { order: 2; max-width: 100%; }
+  .hero-visual  { order: 3; }
+
+  .hero-cta-group { justify-content: center; }
+
+  .hero-quote {
+    text-align: left;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-title { font-size: clamp(2.2rem, 7vw, 3.2rem); }
+}
+
+/* Mobile (768px): stack vertically — logo → text → book */
+@media (max-width: 768px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .hero-brand-col {
+    grid-column: 1;
+    order: 1;
+  }
+
+  .hero-brand-logo { width: clamp(80px, 22vw, 120px); }
+
+  .hero-brand-name {
+    font-size: clamp(0.85rem, 3.5vw, 1rem);
+    letter-spacing: 0.04em;
+  }
+
+  .hero-brand-role {
+    font-size: clamp(0.58rem, 2vw, 0.7rem);
+  }
+
+  .hero-content {
+    order: 2;
+    max-width: 100%;
+  }
+
+  .hero-visual { order: 3; }
+
+  .hero-cta-group {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* Small mobile (480px) */
+@media (max-width: 480px) {
+  .hero-brand-logo { width: clamp(72px, 24vw, 100px); }
+  .hero-brand-name { font-size: 0.88rem; }
+  .hero-brand-inner::after { width: 24px; }
+}
+
+/* ==========================================================================
+   MOBILE NAV — show branding text, premium hamburger
+   ========================================================================== */
+
+/* On mobile the nav-logo-text-only should always show the text */
+@media (max-width: 768px) {
+  .nav-logo-text-only .nav-logo-text {
+    display: inline !important;
+    font-size: clamp(0.68rem, 3.5vw, 0.85rem);
+    letter-spacing: 0.18em;
+  }
+
+  /* Hamburger upgrade — slightly larger tap target */
+  .menu-toggle {
+    width: 32px;
+    height: 22px;
+    gap: 6px;
+  }
+
+  .hamburger-bar {
+    height: 2px;
+    border-radius: 2px;
+  }
+
+  /* Drawer: smoother premium slide-in */
+  .nav-drawer {
+    transition: right 0.4s var(--ease-lux);
+    box-shadow: -24px 0 60px rgba(0,0,0,0.12);
+  }
+
+  /* Active link in drawer: gold accent */
+  .nav-links a.active {
+    color: var(--gold-hi);
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--gold-hi);
+  }
+}
+
+/* Hide old standalone featured-logo-strip if it somehow remains */
+.featured-logo-strip { display: none !important; }

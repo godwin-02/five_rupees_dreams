@@ -1,0 +1,151 @@
+ <!-- <section id="endorsements" class="endorsements-section section-pad" aria-labelledby="endorsements-heading" data-reveal>
+            <div class="container">
+                <div class="section-header-center">
+                    <span class="eyebrow">What People Are Saying</span>
+                    <h2 class="section-title" id="endorsements-heading">Endorsements &amp; Testimonials</h2>
+                    <p class="section-intro">Words from readers, educators, chaplains, and community leaders whose lives were touched by this story.</p>
+                </div>
+            -->
+                <!-- Desktop: static grid. Mobile: carousel wrapper -->
+                <div class="endorsements-carousel-outer" id="endorsements-carousel-outer" role="region" aria-label="Endorsements carousel" aria-roledescription="carousel">
+                    <div class="endorsements-grid" id="endorsements-track" aria-live="polite">
+
+                        <div class="endorsement-card luxury-card">
+                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
+                            <p class="endorsement-text">The Five Rupees Dreams is a moving reflection on resilience, purpose, and faith. Francis shares his journey with honesty and humility, offering readers a powerful reminder that even the smallest beginnings can lead to meaningful lives.</p>
+                            <div class="endorsement-footer">
+                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                                <div class="endorsement-author-info">
+                                    <span class="endorsement-name">Fr. Amalraj SMM</span>
+                                    <span class="endorsement-role">Spiritual Mentor &amp; Community Leader</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endorsement-card luxury-card">
+                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
+                            <p class="endorsement-text">This book speaks to the human spirit. Through personal experiences and deep reflection, Francis encourages readers to discover hope, courage, and purpose even in the midst of life's challenges.</p>
+                            <div class="endorsement-footer">
+                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                                <div class="endorsement-author-info">
+                                    <span class="endorsement-name">Fr. Jayakumar SMM</span>
+                                    <span class="endorsement-role">Educator &amp; Mentor</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endorsement-card luxury-card">
+                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
+                            <p class="endorsement-text">What began as a friendship became a shared belief in a story that deserved to be told. The Five Rupees Dreams is not only a memoir, but a message of humanity, perseverance, and hope that can inspire readers across cultures.</p>
+                            <div class="endorsement-footer">
+                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                                <div class="endorsement-author-info">
+                                    <span class="endorsement-name">Mr. Juergen John &amp; Uta</span>
+                                    <span class="endorsement-role">Publishers, Mentors &amp; Global Friends</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endorsement-card luxury-card">
+                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
+                            <p class="endorsement-text">Francis invites readers into a journey of growth, healing, and self-discovery. His story demonstrates that true success is not measured by where we begin, but by who we become.</p>
+                            <div class="endorsement-footer">
+                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                                <div class="endorsement-author-info">
+                                    <span class="endorsement-name">Fr. Jesuraj Samynatham</span>
+                                    <span class="endorsement-role">Community Builder &amp; Spiritual Guide</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /.endorsements-grid -->
+
+                    <!-- Mobile-only carousel controls (hidden on desktop via CSS) -->
+                    <div class="mobile-carousel-dots" id="endorsements-dots" role="tablist" aria-label="Endorsement navigation" aria-hidden="true">
+                        <!-- Injected by JS on mobile -->
+                    </div>
+                </div><!-- /.endorsements-carousel-outer -->
+
+            </div>
+        </section> 
+
+         <section id="media" class="media-section section-pad" aria-labelledby="media-heading" data-reveal>
+            <div class="container">
+                <div class="section-header-center">
+                    <span class="eyebrow">Media Presence</span>
+                    <h2 class="section-title" id="media-heading">Media &amp; Interviews</h2>
+                    <p class="section-intro">Francis is available for podcast interviews, speaking engagements, YouTube conversations, and media appearances. Watch this space.</p>
+                </div>
+
+                <!-- Desktop: static grid. Mobile: carousel wrapper -->
+                <div class="media-carousel-outer" id="media-carousel-outer" role="region" aria-label="Media carousel" aria-roledescription="carousel">
+                    <div class="media-grid" id="media-track" aria-live="polite">
+
+                        <div class="media-card luxury-card">
+                            <div class="media-icon-wrap" aria-hidden="true">
+                                <i class="fas fa-podcast"></i>
+                            </div>
+                            <h3 class="media-card-title">Podcast Appearances</h3>
+                            <p class="media-card-desc">Francis discusses resilience, chaplaincy, spiritual care, and purpose-driven living with audiences worldwide.</p>
+                            <span class="media-coming-soon">Coming Soon</span>
+                        </div>
+
+                        <div class="media-card luxury-card">
+                            <div class="media-icon-wrap" aria-hidden="true">
+                                <i class="fab fa-youtube"></i>
+                            </div>
+                            <h3 class="media-card-title">YouTube Talks</h3>
+                            <p class="media-card-desc">Watch Francis speak on topics of faith, humanity, emotional healing, and the five rupees journey on the Life TV Thooya channel.</p>
+                            <a href="https://www.youtube.com/@LifeTVThooya" target="_blank" rel="noopener noreferrer" class="btn btn-outline media-btn" aria-label="Visit YouTube channel">
+                                <i class="fab fa-youtube" aria-hidden="true"></i> Visit Channel
+                            </a>
+                        </div>
+
+                        <div class="media-card luxury-card">
+                            <div class="media-icon-wrap" aria-hidden="true">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <h3 class="media-card-title">Press &amp; Interviews</h3>
+                            <p class="media-card-desc">Media inquiries, interview requests, and press features are welcome. Reach out to connect Francis with your platform.</p>
+                            <a href="#contact" class="btn btn-outline media-btn">
+                                <i class="fas fa-envelope" aria-hidden="true"></i> Media Inquiry
+                            </a>
+                        </div>
+
+                        <div class="media-card luxury-card">
+                            <div class="media-icon-wrap" aria-hidden="true">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <h3 class="media-card-title">Guest Presentations</h3>
+                            <p class="media-card-desc">Francis is available for guest presentations at universities, hospitals, faith communities, and conferences globally.</p>
+                            <span class="media-coming-soon">Booking Open</span>
+                        </div>
+
+                    </div><!-- /.media-grid -->
+
+                    <!-- Mobile-only carousel controls (hidden on desktop via CSS) -->
+                    <div class="mobile-carousel-dots" id="media-dots" role="tablist" aria-label="Media navigation" aria-hidden="true">
+                        <!-- Injected by JS on mobile -->
+                    </div>
+                </div><!-- /.media-carousel-outer -->
+
+            </div>
+        </section>
+ <section id="book" class="book-section section-pad" aria-labelledby="book-heading" data-reveal>
+            <div class="container">
+                <div class="section-header-center">
+                    <span class="eyebrow">The Book</span>
+                    <h2 class="section-title" id="book-heading">Synopsis &amp; Themes</h2>
+                </div>
+                <div class="book-grid">
+                    <div class="luxury-card">
+                        <span class="card-eyebrow">Core Philosophy</span>
+                        <h3 class="card-title">Synopsis</h3>
+                        <p class="body-text-secondary">The narrative operates as both a precise tactical memoir and a philosophical manual for self-actualization. Tracking the trajectory of a life engineered from absolute minimalism, it challenges foundational paradigms regarding capital, destiny, and institutional change.</p>
+                        <p class="body-text-secondary" style="margin-top:1rem;">Born from five rupees and extraordinary resilience, this story reaches across continents to deliver a message of profound hope.</p>
+                        <div class="purchase-box">
+                            <a href="#contact" class="btn btn-primary full-width">
+                                <i class="fas fa-shopping-bag" aria-hidden="true"></i> Purchase from Website
+                            </a>
+                        </div>
+                    </div>

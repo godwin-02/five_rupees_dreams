@@ -29,11 +29,11 @@
     <title>The Five Rupees Dreams | Francis Soundararajan — Author, Chaplain & Speaker</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="64x64" href="./images/favicon-64.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-32.png">
-    <link rel="shortcut icon" href="./images/favicon-32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="./images/logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/logo.png">
+    <link rel="shortcut icon" href="./images/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/logo.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,8 +55,7 @@
     <header role="banner">
         <nav id="main-nav" aria-label="Primary Navigation">
             <div class="nav-container">
-                <a href="#hero" class="nav-logo" aria-label="Francis Soundararajan — Home">
-                    <img src="./images/logo.png" alt="Francis Soundararajan" class="nav-logo-img" width="50" height="50">
+                <a href="#hero" class="nav-logo nav-logo-text-only" aria-label="Francis Soundararajan — Home">
                     <span class="nav-logo-text">FRANCIS SOUNDARARAJAN</span>
                 </a>
 
@@ -71,10 +70,10 @@
                 <div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="false" aria-label="Navigation menu">
                     <ul class="nav-links" role="list">
                         <li role="listitem"><a href="#hero">Home</a></li>
-                        <li role="listitem"><a href="#book">Book</a></li>
+                       
                         <li role="listitem"><a href="#author">Author</a></li>
                         <li role="listitem"><a href="#publisher">Publisher</a></li>
-                        <li role="listitem"><a href="#endorsements">Endorsements</a></li>
+            
                         <li role="listitem"><a href="#speaking">Speaking</a></li>
                         <li role="listitem"><a href="#gallery">Gallery</a></li>
                         <li role="listitem"><a href="#reviews">Reviews</a></li>
@@ -86,6 +85,9 @@
         </nav>
     </header>
 
+    <!-- Toast notification container -->
+    <div id="toast-container" class="toast-container" role="region" aria-live="polite" aria-label="Notifications"></div>
+
     <main id="main-content">
 
         <!-- ================================================================
@@ -94,11 +96,21 @@
         <section id="hero" class="hero-section" aria-labelledby="hero-title" data-reveal>
             <div class="hero-ambient" aria-hidden="true"></div>
             <div class="container hero-container">
+
+                <!-- Left col: Logo + author branding -->
+                <div class="hero-brand-col">
+                    <div class="hero-brand-inner">
+                        <img src="./images/logo.png" alt="The Five Rupees Dreams" class="hero-brand-logo" loading="eager">
+                        <span class="hero-brand-name">Francis Soundararajan</span>
+                        <span class="hero-brand-role">Author · Chaplain · Speaker</span>
+                    </div>
+                </div>
+
+                <!-- Centre col: Text content -->
                 <div class="hero-content">
                     <span class="hero-tagline" aria-label="Genre: Bestselling Biography">Bestselling Inspirational Memoir</span>
                     <h1 class="hero-title" id="hero-title">THE FIVE<br>RUPEES DREAMS</h1>
-                    <p class="hero-journey-subtitle">A journey from humble beginnings to purpose, resilience, and hope.</p>
-                    <p class="hero-subtitle">From five rupees to a life of meaning.</p>
+                    <p class="hero-journey-subtitle">Life Lessons From Poverty to Possibility</p>
                     <blockquote class="hero-quote">
                         <p>"Every great journey begins with a small dream."</p>
                     </blockquote>
@@ -109,6 +121,8 @@
                         <a href="#contact" class="btn btn-outline">Connect</a>
                     </div>
                 </div>
+
+                <!-- Right col: Book cover -->
                 <div class="hero-visual" aria-hidden="true">
                     <div class="book-stage">
                         <div class="book-showcase">
@@ -123,6 +137,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
             <a href="#author" class="hero-scroll-cue" aria-label="Scroll to author section">
                 <span class="scroll-cue-line"></span>
@@ -134,54 +149,8 @@
         <!-- ================================================================
              BOOK SECTION
         ================================================================ -->
-        <section id="book" class="book-section section-pad" aria-labelledby="book-heading" data-reveal>
-            <div class="container">
-                <div class="section-header-center">
-                    <span class="eyebrow">The Book</span>
-                    <h2 class="section-title" id="book-heading">Synopsis &amp; Themes</h2>
-                </div>
-                <div class="book-grid">
-                    <div class="luxury-card">
-                        <span class="card-eyebrow">Core Philosophy</span>
-                        <h3 class="card-title">Synopsis</h3>
-                        <p class="body-text-secondary">The narrative operates as both a precise tactical memoir and a philosophical manual for self-actualization. Tracking the trajectory of a life engineered from absolute minimalism, it challenges foundational paradigms regarding capital, destiny, and institutional change.</p>
-                        <p class="body-text-secondary" style="margin-top:1rem;">Born from five rupees and extraordinary resilience, this story reaches across continents to deliver a message of profound hope.</p>
-                        <div class="purchase-box">
-                            <a href="#contact" class="btn btn-primary full-width">
-                                <i class="fas fa-shopping-bag" aria-hidden="true"></i> Purchase from Website
-                            </a>
-                        </div>
-                    </div>
-                    <div class="luxury-card card-gold">
-                        <span class="card-eyebrow">Excerpts from the Book</span>
-                        <div class="quotes-carousel" role="region" aria-label="Book excerpts carousel" aria-live="polite">
-                            <div class="quote-slide active" role="article">
-                                <p class="quote-text">"Poverty did not stop my life. It introduced me to resilience."</p>
-                            </div>
-                            <div class="quote-slide" role="article">
-                                <p class="quote-text">"Sometimes five rupees is not money. It is dignity."</p>
-                            </div>
-                            <div class="quote-slide" role="article">
-                                <p class="quote-text">"The world changed when someone believed me."</p>
-                            </div>
-                            <div class="quote-slide" role="article">
-                                <p class="quote-text">"I crossed countries, but the real journey was discovering myself."</p>
-                            </div>
-                            <div class="quote-slide" role="article">
-                                <p class="quote-text">"Some people become successful. Some become human. Life taught me to become both."</p>
-                            </div>
-                        </div>
-                        <div class="quote-nav" aria-label="Quote navigation">
-                            <button class="quote-dot active" aria-label="Quote 1" data-index="0"></button>
-                            <button class="quote-dot" aria-label="Quote 2" data-index="1"></button>
-                            <button class="quote-dot" aria-label="Quote 3" data-index="2"></button>
-                            <button class="quote-dot" aria-label="Quote 4" data-index="3"></button>
-                            <button class="quote-dot" aria-label="Quote 5" data-index="4"></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+       
+                   
         
         <!-- ================================================================
              AUTHOR SECTION
@@ -197,7 +166,7 @@
                             </div>
                         </div>
                         <div class="publisher-text-col">
-                            <span class="eyebrow">The Author</span>
+                            <span class="eyebrow">About The Author</span>
                             <h2 class="section-title" id="author-heading">Francis Soundararajan</h2>
                             <p class="lead-italic">Author · Chaplain · Speaker · Educator</p>
 
@@ -220,22 +189,22 @@
                                 <div class="author-highlight-item" role="listitem">
                                     <div class="highlight-icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></div>
                                     <div class="highlight-body">
-                                        <span class="highlight-label">Origins</span>
+                                        <span class="highlight-label">Born And Raised</span>
                                         <span class="highlight-value">Tamil Nadu, India</span>
                                     </div>
                                 </div>
                                 <div class="author-highlight-item" role="listitem">
                                     <div class="highlight-icon" aria-hidden="true"><i class="fas fa-hospital"></i></div>
                                     <div class="highlight-body">
-                                        <span class="highlight-label">Clinical Training</span>
-                                        <span class="highlight-value">Vanderbilt University Medical Center</span>
+                                        <span class="highlight-label">Residency At</span>
+                                        <span class="highlight-value">Vanderbilt University Medical Center, Nashville, USA</span>
                                     </div>
                                 </div>
                                 <div class="author-highlight-item" role="listitem">
                                     <div class="highlight-icon" aria-hidden="true"><i class="fas fa-globe-americas"></i></div>
                                     <div class="highlight-body">
-                                        <span class="highlight-label">Ministry Reach</span>
-                                        <span class="highlight-value">India &amp; United States</span>
+                                        <span class="highlight-label">Reaching Across</span>
+                                        <span class="highlight-value"> United States &amp; India</span>
                                     </div>
                                 </div>
                                 <div class="author-highlight-item" role="listitem">
@@ -266,9 +235,10 @@
                             </div>
                         </div>
                         <div class="publisher-text-col">
+                            <img src="./images/publisherlogo.png" alt="Jürgen John Publishing logo" class="publisher-logo" loading="lazy">
                             <span class="eyebrow">Production House</span>
                             <h2 class="section-title" id="publisher-heading">Jürgen John Publishing</h2>
-                            <p class="body-text-secondary">Jürgen John is a retired engineering executive from Daimler-Benz, entrepreneur, mentor, world traveler, philanthropist, and founder of Hooklift. Together with his wife Uta, he has dedicated his life to encouraging people, building relationships across cultures, and supporting meaningful causes. What began as a chance meeting on a beach in Chennai evolved into a remarkable friendship that bridged East and West, eventually becoming an important part of the journey behind this book.</p>
+                            <p class="body-text-secondary">Jürgen John is a retired engineering executive from Daimler-Benz, entrepreneur, mentor, world traveler, philanthropist, and founder of Hooklift from Germany. Together with his wife Uta, he has dedicated his life to encouraging people, building relationships across cultures, and supporting meaningful causes. What began as a chance meeting on a beach in Chennai evolved into a remarkable friendship that bridged East and West, eventually becoming an important part of the journey behind this book.</p>
                             <div class="info-list" role="list">
                                 <div class="info-item" role="listitem">
                                     <div class="info-icon" aria-hidden="true">
@@ -277,6 +247,14 @@
                                     <div class="info-body">
                                         <span class="info-label">Publisher</span>
                                         <span class="info-value">Jürgen John</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="author-highlight-item" role="listitem">
+                                    <div class="highlight-icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></div>
+                                    <div class="highlight-body">
+                                        
+                                        <span class="highlight-value">Germany</span>
                                     </div>
                                 </div>
                                 <div class="info-item" role="listitem">
@@ -306,186 +284,60 @@
 
 
         <!-- ================================================================
-             ENDORSEMENTS SECTION
+             EXCERPTS FROM THE BOOK
         ================================================================ -->
-        <section id="endorsements" class="endorsements-section section-pad" aria-labelledby="endorsements-heading" data-reveal>
-            <div class="container">
-                <div class="section-header-center">
-                    <span class="eyebrow">What People Are Saying</span>
-                    <h2 class="section-title" id="endorsements-heading">Endorsements &amp; Testimonials</h2>
-                    <p class="section-intro">Words from readers, educators, chaplains, and community leaders whose lives were touched by this story.</p>
+        <section id="book" class="excerpts-section" aria-labelledby="excerpts-heading" data-reveal>
+            <div class="excerpts-inner">
+                <div class="excerpts-header">
+                    <span class="eyebrow">The Book</span>
+                    <h2 class="section-title" id="excerpts-heading">Excerpts from the Book</h2>
                 </div>
-
-                <!-- Desktop: static grid. Mobile: carousel wrapper -->
-                <div class="endorsements-carousel-outer" id="endorsements-carousel-outer" role="region" aria-label="Endorsements carousel" aria-roledescription="carousel">
-                    <div class="endorsements-grid" id="endorsements-track" aria-live="polite">
-
-                        <div class="endorsement-card luxury-card">
-                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
-                            <p class="endorsement-text">This book is a powerful reminder that resilience can transform hardship into purpose. Francis's journey moved me deeply — proof that authentic faith and human dignity go hand in hand.</p>
-                            <div class="endorsement-footer">
-                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
-                                <div class="endorsement-author-info">
-                                    <span class="endorsement-name">A Grateful Reader</span>
-                                    <span class="endorsement-role">Community Leader</span>
-                                </div>
-                            </div>
+                <div class="excerpts-card" role="region" aria-label="Book excerpts">
+                    <div class="quotes-carousel" role="region" aria-label="Book excerpts carousel" aria-live="polite">
+                        <div class="quote-slide active" role="article">
+                            <p class="quote-text">"Poverty did not stop my life. It introduced me to resilience."</p>
                         </div>
-
-                        <div class="endorsement-card luxury-card">
-                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
-                            <p class="endorsement-text">An inspiring story of hope, dignity, and humanity. I recommend this memoir to every educator and counselor — it redefines what it means to serve with compassion and conviction.</p>
-                            <div class="endorsement-footer">
-                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
-                                <div class="endorsement-author-info">
-                                    <span class="endorsement-name">A Dedicated Educator</span>
-                                    <span class="endorsement-role">Academic &amp; Mentor</span>
-                                </div>
-                            </div>
+                        <div class="quote-slide" role="article">
+                            <p class="quote-text">"Sometimes five rupees is not money. It is dignity."</p>
                         </div>
-
-                        <div class="endorsement-card luxury-card">
-                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
-                            <p class="endorsement-text">As a fellow chaplain, I found this memoir to be an extraordinary testament to the ministry of presence. Francis captures the sacred encounter between suffering and grace with honesty and grace.</p>
-                            <div class="endorsement-footer">
-                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
-                                <div class="endorsement-author-info">
-                                    <span class="endorsement-name">A Fellow Chaplain</span>
-                                    <span class="endorsement-role">Healthcare Chaplain</span>
-                                </div>
-                            </div>
+                        <div class="quote-slide" role="article">
+                            <p class="quote-text">"The world changed when someone believed me."</p>
                         </div>
-
-                        <div class="endorsement-card luxury-card">
-                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
-                            <p class="endorsement-text">A rare book that speaks to both the heart and the mind. Francis Soundararajan's story crosses cultures, religions, and borders — reminding us that our shared humanity is what makes us strong.</p>
-                            <div class="endorsement-footer">
-                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
-                                <div class="endorsement-author-info">
-                                    <span class="endorsement-name">A Community Leader</span>
-                                    <span class="endorsement-role">International Speaker</span>
-                                </div>
-                            </div>
+                        <div class="quote-slide" role="article">
+                            <p class="quote-text">"I crossed countries, but the real journey was discovering myself."</p>
                         </div>
-
-                        <div class="endorsement-card luxury-card">
-                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
-                            <p class="endorsement-text">Five Rupees Dreams is not just a biography — it is a manual for hope. I gave this book to every young person I mentor. The message is timeless: your origins do not define your destination.</p>
-                            <div class="endorsement-footer">
-                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
-                                <div class="endorsement-author-info">
-                                    <span class="endorsement-name">A Mentor &amp; Coach</span>
-                                    <span class="endorsement-role">Youth Empowerment Leader</span>
-                                </div>
-                            </div>
+                        <div class="quote-slide" role="article">
+                            <p class="quote-text">"Some people become successful. Some become human. Life taught me to become both."</p>
                         </div>
-
-                        <div class="endorsement-card luxury-card">
-                            <div class="endorsement-quote-mark" aria-hidden="true">&ldquo;</div>
-                            <p class="endorsement-text">Reading this memoir in one sitting, I was reminded of why I entered pastoral ministry. Francis's story is luminous — a bridge between continents, cultures, and the deepest longings of the human soul.</p>
-                            <div class="endorsement-footer">
-                                <div class="endorsement-avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
-                                <div class="endorsement-author-info">
-                                    <span class="endorsement-name">A Ministry Leader</span>
-                                    <span class="endorsement-role">Pastoral Counselor</span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div><!-- /.endorsements-grid -->
-
-                    <!-- Mobile-only carousel controls (hidden on desktop via CSS) -->
-                    <div class="mobile-carousel-dots" id="endorsements-dots" role="tablist" aria-label="Endorsement navigation" aria-hidden="true">
-                        <!-- Injected by JS on mobile -->
                     </div>
-                </div><!-- /.endorsements-carousel-outer -->
-
+                    <div class="quote-nav" aria-label="Quote navigation">
+                        <button class="quote-dot active" aria-label="Quote 1" data-index="0"></button>
+                        <button class="quote-dot" aria-label="Quote 2" data-index="1"></button>
+                        <button class="quote-dot" aria-label="Quote 3" data-index="2"></button>
+                        <button class="quote-dot" aria-label="Quote 4" data-index="3"></button>
+                        <button class="quote-dot" aria-label="Quote 5" data-index="4"></button>
+                    </div>
+                </div>
             </div>
         </section>
-
         <!-- ================================================================
              MEDIA & INTERVIEWS SECTION
         ================================================================ -->
-        <section id="media" class="media-section section-pad" aria-labelledby="media-heading" data-reveal>
-            <div class="container">
-                <div class="section-header-center">
-                    <span class="eyebrow">Media Presence</span>
-                    <h2 class="section-title" id="media-heading">Media &amp; Interviews</h2>
-                    <p class="section-intro">Francis is available for podcast interviews, speaking engagements, YouTube conversations, and media appearances. Watch this space.</p>
-                </div>
-
-                <!-- Desktop: static grid. Mobile: carousel wrapper -->
-                <div class="media-carousel-outer" id="media-carousel-outer" role="region" aria-label="Media carousel" aria-roledescription="carousel">
-                    <div class="media-grid" id="media-track" aria-live="polite">
-
-                        <div class="media-card luxury-card">
-                            <div class="media-icon-wrap" aria-hidden="true">
-                                <i class="fas fa-podcast"></i>
-                            </div>
-                            <h3 class="media-card-title">Podcast Appearances</h3>
-                            <p class="media-card-desc">Francis discusses resilience, chaplaincy, spiritual care, and purpose-driven living with audiences worldwide.</p>
-                            <span class="media-coming-soon">Coming Soon</span>
-                        </div>
-
-                        <div class="media-card luxury-card">
-                            <div class="media-icon-wrap" aria-hidden="true">
-                                <i class="fab fa-youtube"></i>
-                            </div>
-                            <h3 class="media-card-title">YouTube Talks</h3>
-                            <p class="media-card-desc">Watch Francis speak on topics of faith, humanity, emotional healing, and the five rupees journey on the Life TV Thooya channel.</p>
-                            <a href="https://www.youtube.com/@LifeTVThooya" target="_blank" rel="noopener noreferrer" class="btn btn-outline media-btn" aria-label="Visit YouTube channel">
-                                <i class="fab fa-youtube" aria-hidden="true"></i> Visit Channel
-                            </a>
-                        </div>
-
-                        <div class="media-card luxury-card">
-                            <div class="media-icon-wrap" aria-hidden="true">
-                                <i class="fas fa-microphone"></i>
-                            </div>
-                            <h3 class="media-card-title">Press &amp; Interviews</h3>
-                            <p class="media-card-desc">Media inquiries, interview requests, and press features are welcome. Reach out to connect Francis with your platform.</p>
-                            <a href="#contact" class="btn btn-outline media-btn">
-                                <i class="fas fa-envelope" aria-hidden="true"></i> Media Inquiry
-                            </a>
-                        </div>
-
-                        <div class="media-card luxury-card">
-                            <div class="media-icon-wrap" aria-hidden="true">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <h3 class="media-card-title">Guest Presentations</h3>
-                            <p class="media-card-desc">Francis is available for guest presentations at universities, hospitals, faith communities, and conferences globally.</p>
-                            <span class="media-coming-soon">Booking Open</span>
-                        </div>
-
-                    </div><!-- /.media-grid -->
-
-                    <!-- Mobile-only carousel controls (hidden on desktop via CSS) -->
-                    <div class="mobile-carousel-dots" id="media-dots" role="tablist" aria-label="Media navigation" aria-hidden="true">
-                        <!-- Injected by JS on mobile -->
-                    </div>
-                </div><!-- /.media-carousel-outer -->
-
-            </div>
-        </section>
+      
 
         <!-- ================================================================
              SPEAKING & EVENTS SECTION
         ================================================================ -->
         <section id="speaking" class="speaking-section section-pad" aria-labelledby="speaking-heading" data-reveal>
             <div class="container">
-                <div class="section-header-center">
-                    <span class="eyebrow">Invite Francis</span>
-                    <h2 class="section-title" id="speaking-heading">Invite Francis to Speak</h2>
-                    <p class="section-intro">Francis brings a cross-cultural, deeply human voice to events worldwide. His talks bridge lived experience with professional expertise in chaplaincy, spiritual care, and personal transformation.</p>
-                </div>
-               
+                
 
                 <div class="speaking-cta-box" data-reveal>
                     <div class="speaking-cta-content">
                         <h3 class="speaking-cta-title">Book Francis for Your Event</h3>
-                        <p class="speaking-cta-desc">Whether you are organising a conference, a university lecture, a faith community gathering, or a corporate wellness event — Francis brings depth, warmth, and authentic story to every stage.</p>
-                        <a href="#contact" class="btn btn-primary">
+                        <p class="speaking-cta-desc">Francis brings a cross-cultural, deeply human voice to events worldwide. His talks bridge lived experience with professional expertise in chaplaincy, spiritual care, and personal transformation.</p>
+              
+                    <a href="#contact" class="btn btn-primary">
                             <i class="fas fa-envelope" aria-hidden="true"></i> Send a Speaking Invitation
                         </a>
                     </div>
@@ -617,8 +469,8 @@
                                     <i class="fas fa-phone"></i>
                                 </div>
                                 <div class="info-body">
-                                    <span class="info-label">India Office</span>
-                                    <a href="tel:+918825666271" class="info-link">+91 88256 66271</a>
+                                    <span class="info-label">US Office</span>
+                                    <a href=" tel:+15027687722" class="info-link">+1 (502) 768-7722</a>
                                 </div>
                             </div>
                             <div class="info-item" role="listitem">
@@ -626,8 +478,8 @@
                                     <i class="fas fa-phone"></i>
                                 </div>
                                 <div class="info-body">
-                                    <span class="info-label">US Office</span>
-                                    <a href="tel:+15027687722" class="info-link">+1 (502) 768-7722</a>
+                                    <span class="info-label">India Office</span>
+                                    <a href="tel:+918825666271" class="info-link">+91 88256 66271</a>
                                 </div>
                             </div>
                         </div>
@@ -643,6 +495,9 @@
                                 </a>
                                 <a href="https://www.youtube.com/@LifeTVThooya" target="_blank" rel="noopener noreferrer" aria-label="YouTube channel" role="listitem" class="social-icon-link">
                                     <i class="fab fa-youtube" aria-hidden="true"></i>
+                                     <a href="https://www.facebook.com/francis.soundararajan.2025?sfnsn=wa&mibextid=RUbZ1f" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" class="social-icon-link">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
                                 </a>
                             </div>
                         </div>
@@ -701,10 +556,10 @@
             <p class="footer-tagline">Author · Chaplain · Speaker · Educator</p>
             <nav class="footer-nav" aria-label="Footer navigation">
                 <a href="#hero">Home</a>
-                <a href="#book">Book</a>
+               
                 <a href="#author">Author</a>
                 <a href="#publisher">Publisher</a>
-                <a href="#endorsements">Endorsements</a>
+   
                 <a href="#speaking">Speaking</a>
                 <a href="#gallery">Gallery</a>
                 <a href="#reviews">Reviews</a>
@@ -719,6 +574,9 @@
                 </a>
                 <a href="https://www.youtube.com/@LifeTVThooya" target="_blank" rel="noopener noreferrer" aria-label="YouTube" role="listitem" class="social-icon-link">
                     <i class="fab fa-youtube" aria-hidden="true"></i>
+                </a>
+                 <a href="https://www.facebook.com/francis.soundararajan.2025?sfnsn=wa&mibextid=RUbZ1f" target="_blank" rel="noopener noreferrer" aria-label="Facebook" role="listitem" class="social-icon-link">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </div>
             <p class="footer-copy">&copy; <span id="footer-year"></span> Francis Soundararajan. All rights reserved.</p>

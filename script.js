@@ -102,109 +102,98 @@ const NavEngine = (() => {
 const GalleryEngine = (() => {
 
   const ITEMS = [
+    // 1. NGO / Ministry
     {
-      src: './images/author.jpeg',
-      title: 'The Author',
-      caption: 'Francis Soundararajan — Author, Chaplain & Humanitarian.',
-      desc: 'A defining portrait of the man behind The Five Rupees Dreams, whose journey from poverty to purpose has inspired thousands.'
+      src: './images/the ngo.jpg',
+      title: 'Community Service',
+      caption: 'Serving communities through compassion, education, and hope.',
+      desc: 'Demonstrating the grassroots humanitarian operations and community development initiatives led by the author.'
     },
-    {
-      src: './images/author-parents.jpeg',
-      title: 'Sacred Ancestry',
-      caption: 'The pillars of a humble origin — Francis with his parents.',
-      desc: "A portrait of the author's parents, whose early lessons in faith and resilience shaped his lifelong mission."
-    },
-    {
-      src: './images/author-family.jpeg',
-      title: 'Foundational Support',
-      caption: 'The complete Soundararajan family sharing a unified journey.',
-      desc: 'Francis pictured with his loving family — his primary source of inspiration and strength in both ministry and writing.'
-    },
-    {
-      src: './images/author old family photo.jpg',
-      title: 'Early Family Memories',
-      caption: 'The roots of a humble journey shaped by love, values, and perseverance.',
-      desc: 'A precious historic glimpse into the family structure that nurtured Francis\'s dreams from a five-rupees beginning.'
-    },
-    {
-      src: './images/author wife cherishing moments.jpg',
-      title: 'Moments of Togetherness',
-      caption: 'Shared laughter, companionship, and cherished family memories.',
-      desc: 'Celebrating the quiet strength and partnership of marriage that has anchored decades of community leadership.'
-    },
-    {
-      src: './images/author-daughter.jpeg',
-      title: 'Joyous Exploration',
-      caption: 'A beautiful snapshot of his daughter exploring the world.',
-      desc: 'Cherishing moments of family life amidst the author\'s busy global commitments.'
-    },
-    {
-      src: './images/little-daughter.jpeg',
-      title: 'Little Daughter',
-      caption: 'A source of inspiration, joy, and hope for tomorrow.',
-      desc: 'The light and hope of the next generation, expressing joy and faith in abundance.'
-    },
-    {
-      src: './images/authordaughter.jpeg',
-      title: 'Cherished Horizons',
-      caption: 'Francis sharing a bright moment with his eldest daughter.',
-      desc: 'A heartwarming moment showing the unbreakable bond between father and daughter.'
-    },
-    {
-      src: './images/father and daughter.jpeg',
-      title: 'Father & Daughter',
-      caption: 'A tender portrait of love, legacy, and lifelong connection.',
-      desc: 'A quiet moment that speaks volumes — the bond between a father and his daughter, rooted in faith and warmth.'
-    },
-    {
-      src: './images/author-inlaw.jpeg',
-      title: 'Extended Legacies',
-      caption: 'A cross-generational portrait with his parents-in-law.',
-      desc: 'Celebrating heritage and family unity woven across generations.'
-    },
-    {
-      src: './images/author-fams.jpeg',
-      title: 'Kinship & Celebration',
-      caption: 'The extended family gathered during a celebratory milestone.',
-      desc: 'A joyous gathering of relatives reflecting the rich community life that anchors the author\'s story.',
-      fallback: './images/family-gathering.jpeg'
-    },
-    {
-      src: './images/cute family.jpeg',
-      title: 'Joyful Family Moments',
-      caption: 'Simple moments that became lasting memories and blessings.',
-      desc: 'A beautiful reminder that the greatest gifts in life are the people we share our journey with.'
-    },
-    {
-      src: './images/family-gathering.jpeg',
-      title: 'Family Gathering',
-      caption: 'Celebrating unity, traditions, and the strength of family bonds.',
-      desc: 'Together in love and laughter — a family gathering that echoes the warmth woven throughout this biography.'
-    },
-    {
-      src: './images/Grandchild.jpeg',
-      title: 'Generations of Hope',
-      caption: 'A reminder that every journey continues through future generations.',
-      desc: 'The story does not end — it is carried forward with joy, innocence, and the promise of tomorrow.'
-    },
-    {
-      src: './images/grandmother.jpeg',
-      title: 'Beloved Grandmother',
-      caption: 'Wisdom, sacrifice, and unconditional love across generations.',
-      desc: 'A portrait honouring the quiet strength of a grandmother whose love laid the foundation for everything that followed.'
-    },
+    // 2. Publisher
     {
       src: './images/John and Uta the Publishers.JPG',
       title: 'Publishing Partners',
-      caption: 'Friends and supporters who helped bring a dream into reality.',
+      caption: 'A remarkable friendship that transformed into a publishing journey.',
       desc: 'Jürgen John and Uta John — the dedicated publishing team behind distributing The Five Rupees Dreams to the global stage.'
     },
+    // 3. Parents
+    {
+      src: './images/author-parents.jpeg',
+      title: 'Sacred Ancestry',
+      caption: 'The roots of faith, sacrifice, and perseverance.',
+      desc: "A portrait of the author's parents, whose early lessons in faith and resilience shaped his lifelong mission."
+    },
+    // 4. In-Laws
+    {
+      src: './images/author-inlaw.jpeg',
+      title: 'Extended Legacies',
+      caption: 'Extended family whose encouragement strengthened the journey.',
+      desc: 'Celebrating heritage and family unity woven across generations.'
+    },
+    // 5. Family gathering
+    {
+      src: './images/family-gathering.jpeg',
+      title: 'Family Gathering',
+      caption: 'Moments of togetherness and celebration.',
+      desc: 'Together in love and laughter — a family gathering that echoes the warmth woven throughout this biography.'
+    },
+    // 6. Cute family
+    {
+      src: './images/cute family.jpeg',
+      title: 'Joyful Family Moments',
+      caption: 'The warmth and joy of family life.',
+      desc: 'A beautiful reminder that the greatest gifts in life are the people we share our journey with.'
+    },
+    // 7. Author family
+    {
+      src: './images/author-family.jpeg',
+      title: 'Foundational Support',
+      caption: 'The people who stood beside every chapter of the story.',
+      desc: 'Francis pictured with his loving family — his primary source of inspiration and strength in both ministry and writing.'
+    },
+    // 8. Author daughter
+    {
+      src: './images/author-daughter.jpeg',
+      title: 'A Father\'s Pride',
+      caption: 'A father\'s pride and a source of inspiration.',
+      desc: 'Cherishing moments of family life amidst the author\'s busy global commitments.'
+    },
+    // 9. Author with wife and publisher
     {
       src: './images/author with his wife and publisher.jpg',
-      title: 'Author, Family & Publisher',
-      caption: 'Celebrating partnership, support, and the journey of publishing.',
+      title: 'Family & Vision',
+      caption: 'A meeting of friendship, family, and vision.',
       desc: 'Commemorating the official milestone of bringing this transformational biography to print alongside loved ones.'
     },
+    // 10. Author wife cherishing moments
+    {
+      src: './images/author wife cherishing moments.jpg',
+      title: 'Cherished Moments',
+      caption: 'Cherished memories that shaped life\'s journey.',
+      desc: 'Celebrating the quiet strength and partnership of marriage that has anchored decades of community leadership.'
+    },
+    // 11. Author old family photo
+    {
+      src: './images/author old family photo.jpg',
+      title: 'Early Memories',
+      caption: 'A glimpse into earlier years and treasured memories.',
+      desc: 'A precious historic glimpse into the family structure that nurtured Francis\'s dreams from a five-rupees beginning.'
+    },
+    // 12. Brothers
+    {
+      src: './images/brothers.jpeg',
+      title: 'Brotherhood',
+      caption: 'Shared bonds, shared struggles, shared dreams.',
+      desc: 'The unbreakable bond between brothers — a story of solidarity, love, and mutual encouragement across every season of life.'
+    },
+    // 13. Sister
+    {
+      src: './images/sister.jpeg',
+      title: 'A Sister\'s Love',
+      caption: 'Family support that remained constant through every season.',
+      desc: 'A cherished family portrait reflecting the deep bonds that shaped the author\'s journey from the very beginning.'
+    },
+    // 14. Remaining
     {
       src: './images/jubilee of Fr.Nelson.jpeg',
       title: 'Jubilee Celebration',
@@ -224,10 +213,16 @@ const GalleryEngine = (() => {
       desc: 'Strengthening ecumenical bonds and sharing a vision of pastoral care and chaplaincy worldwide.'
     },
     {
-      src: './images/the ngo.jpg',
-      title: 'Community Service Mission',
-      caption: 'Empowering lives through education, compassion, and social outreach.',
-      desc: 'Demonstrating the grassroots humanitarian operations and community development initiatives led by the author.'
+      src: './images/Grandchild.jpeg',
+      title: 'Generations of Hope',
+      caption: 'A reminder that every journey continues through future generations.',
+      desc: 'The story does not end — it is carried forward with joy, innocence, and the promise of tomorrow.'
+    },
+    {
+      src: './images/grandmother.jpeg',
+      title: 'Beloved Grandmother',
+      caption: 'Wisdom, sacrifice, and unconditional love across generations.',
+      desc: 'A portrait honouring the quiet strength of a grandmother whose love laid the foundation for everything that followed.'
     }
   ];
 
@@ -725,6 +720,7 @@ const ReviewEngine = (() => {
       render();
       resetForm();
       showFb('Your review has been published.', 'success');
+      ToastEngine.show('Your review has been published successfully.', 'success', 6000);
     });
   };
 
@@ -931,6 +927,7 @@ const ContactEngine = (() => {
 
         form.reset();
         showFb('Your message has been sent to Francis. He will be in touch soon.', 'success');
+        ToastEngine.show('Your message has been sent to Francis. He will be in touch soon.', 'success', 8000);
 
       } catch (err) {
         const isAbort   = err.name === 'AbortError';
@@ -970,9 +967,28 @@ const UtilEngine = (() => {
           obs.unobserve(e.target);
         }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
 
     els.forEach(el => obs.observe(el));
+  };
+
+  /* Stagger child grids when their parent section is revealed */
+  const initStaggerGrids = () => {
+    const grids = document.querySelectorAll(
+      '.endorsements-grid, .media-grid, .speaking-topics-grid, .author-highlights, .contact-cards-grid'
+    );
+    if (!grids.length) return;
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('stagger-revealed');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+
+    grids.forEach(g => obs.observe(g));
   };
 
   const initFooterYear = () => {
@@ -992,11 +1008,67 @@ const UtilEngine = (() => {
 
   const init = () => {
     initReveals();
+    initStaggerGrids();
     initFooterYear();
     initModalA11y();
   };
 
   return { init };
+})();
+
+/* ============================================================
+   TOAST ENGINE — premium branded notifications
+   ============================================================ */
+const ToastEngine = (() => {
+  const container = document.getElementById('toast-container');
+
+  const ICONS = {
+    success: '<i class="fas fa-check" aria-hidden="true"></i>',
+    error:   '<i class="fas fa-exclamation" aria-hidden="true"></i>',
+    info:    '<i class="fas fa-info" aria-hidden="true"></i>',
+  };
+
+  const TITLES = {
+    success: 'Success',
+    error:   'Attention',
+    info:    'Notice',
+  };
+
+  const show = (message, type = 'info', duration = 6000) => {
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+      <div class="toast-icon">${ICONS[type] || ICONS.info}</div>
+      <div class="toast-body">
+        <span class="toast-title">${TITLES[type] || 'Notice'}</span>
+        <span class="toast-msg">${message}</span>
+      </div>
+      <button class="toast-close" aria-label="Dismiss notification">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>`;
+
+    container.appendChild(toast);
+
+    /* Trigger show animation */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => toast.classList.add('toast-show'));
+    });
+
+    const dismiss = () => {
+      toast.classList.remove('toast-show');
+      toast.classList.add('toast-hide');
+      setTimeout(() => toast.remove(), 500);
+    };
+
+    toast.querySelector('.toast-close').addEventListener('click', dismiss);
+
+    if (duration > 0) setTimeout(dismiss, duration);
+  };
+
+  return { show };
 })();
 
 /* ============================================================
