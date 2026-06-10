@@ -6,7 +6,7 @@
  *  1. NavEngine        — scroll effects, spy, mobile drawer
  *  2. GalleryEngine    — swipe + drag gallery with captions
  *  3. QuotesEngine     — book excerpt carousel
- *  4. ReviewEngine     — swipeable review carousel + CRUD
+ *  4. ReviewEngine     — swipeable review carousel + CRUD (localStorage)
  *  5. ContactEngine    — EmailJS / FormSubmit delivery
  *  6. UtilEngine       — scroll reveals, back-to-top, footer year
  */
@@ -269,26 +269,23 @@ const GalleryEngine = (() => {
     });
   };
 
-  const buildDots = () => {
-    if (!dotsWrap) return;
-    dotsWrap.innerHTML = '';
-    ITEMS.forEach((_, i) => {
-      const dot = document.createElement('button');
-      dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('role', 'tab');
-      dot.setAttribute('aria-label', `Go to photo ${i + 1}`);
-      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-      dot.addEventListener('click', () => goTo(i));
-      dotsWrap.appendChild(dot);
-    });
+  const counterDisplay = document.getElementById('gallery-counter-display');
+
+  const pad = n => String(n).padStart(2, '0');
+
+  const buildCounter = () => {
+    /* dots container now holds the counter — nothing to inject */
+    updateCounter();
+  };
+
+  const updateCounter = () => {
+    if (counterDisplay) {
+      counterDisplay.textContent = `${pad(current + 1)} / ${pad(total)}`;
+    }
   };
 
   const updateUI = () => {
-    const dots = dotsWrap ? dotsWrap.querySelectorAll('.gallery-dot') : [];
-    dots.forEach((d, i) => {
-      d.classList.toggle('active', i === current);
-      d.setAttribute('aria-selected', i === current ? 'true' : 'false');
-    });
+    updateCounter();
   };
 
   const goTo = (index) => {
@@ -308,15 +305,54 @@ const GalleryEngine = (() => {
     autoTimer = setInterval(next, 5500);
   };
 
-  const stopAuto  = () => clearInterval(autoTimer);
+  const stopAuto = () => clearInterval(autoTimer);
 
-  /* Pointer / touch drag */
-  const onDragStart = (x) => { dragStart = x; isDragging = true; stopAuto(); };
-  const onDragEnd   = (x) => {
+  /* ── Premium live-drag with momentum ── */
+  let dragOriginX   = 0;
+  let dragLiveX     = 0;
+  let dragOriginTx  = 0;
+
+  const getTx = () => -(current * 100); /* % */
+
+  const onDragStart = (x) => {
+    if (isAnimating) return;
+    dragStart     = x;
+    dragOriginX   = x;
+    dragLiveX     = x;
+    dragOriginTx  = getTx();
+    isDragging    = true;
+    stopAuto();
+    track.style.transition = 'none';
+    viewport && viewport.classList.add('is-dragging');
+  };
+
+  const onDragMove = (x) => {
+    if (!isDragging) return;
+    dragLiveX = x;
+    const vw      = viewport ? viewport.offsetWidth : window.innerWidth;
+    const deltaPx = x - dragOriginX;
+    const deltaPc = (deltaPx / vw) * 100;
+    /* Edge resistance */
+    let resistance = 1;
+    if ((current === 0 && deltaPx > 0) || (current === total - 1 && deltaPx < 0)) {
+      resistance = 0.22;
+    }
+    track.style.transform = `translateX(${dragOriginTx + deltaPc * resistance}%)`;
+  };
+
+  const onDragEnd = (x) => {
     if (!isDragging) return;
     isDragging = false;
-    const delta = dragStart - x;
-    if (Math.abs(delta) > 50) { delta > 0 ? next() : prev(); }
+    viewport && viewport.classList.remove('is-dragging');
+    track.style.transition = '';
+    const vw    = viewport ? viewport.offsetWidth : window.innerWidth;
+    const delta = dragOriginX - x;
+    const threshold = vw * 0.12;
+    if (Math.abs(delta) > threshold) {
+      delta > 0 ? next() : prev();
+    } else {
+      track.style.transform = `translateX(${getTx()}%)`;
+    }
     startAuto();
   };
 
@@ -325,29 +361,30 @@ const GalleryEngine = (() => {
 
     /* Touch */
     viewport.addEventListener('touchstart', e => onDragStart(e.changedTouches[0].clientX), { passive: true });
+    viewport.addEventListener('touchmove',  e => onDragMove(e.changedTouches[0].clientX),  { passive: true });
     viewport.addEventListener('touchend',   e => onDragEnd(e.changedTouches[0].clientX),   { passive: true });
+    viewport.addEventListener('touchcancel',() => onDragEnd(dragLiveX),                    { passive: true });
 
-    /* Mouse / Pointer */
-    viewport.addEventListener('mousedown',  e => { e.preventDefault(); onDragStart(e.clientX); });
-    window.addEventListener ('mouseup',    e => onDragEnd(e.clientX));
+    /* Mouse */
+    viewport.addEventListener('mousedown', e => { e.preventDefault(); onDragStart(e.clientX); });
+    window.addEventListener('mousemove',   e => { if (isDragging) onDragMove(e.clientX); }, { passive: true });
+    window.addEventListener('mouseup',     e => onDragEnd(e.clientX));
+    window.addEventListener('mouseleave',  () => { if (isDragging) onDragEnd(dragLiveX); });
+
     viewport.style.cursor = 'grab';
     viewport.addEventListener('mousedown', () => { viewport.style.cursor = 'grabbing'; });
-    window.addEventListener ('mouseup',   () => { viewport.style.cursor = 'grab'; });
+    window.addEventListener('mouseup',     () => { viewport.style.cursor = 'grab'; });
   };
 
   const init = () => {
     if (!track) return;
     buildSlides();
-    buildDots();
-    updateUI();
-
-    /* set track to flex with translateX */
+    buildCounter();
     track.style.transform = 'translateX(0)';
 
     prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
     nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
 
-    /* Keyboard */
     document.addEventListener('keydown', e => {
       if (!viewport) return;
       const r = viewport.getBoundingClientRect();
@@ -358,7 +395,6 @@ const GalleryEngine = (() => {
     });
 
     bindDrag();
-
     viewport && viewport.addEventListener('mouseenter', stopAuto);
     viewport && viewport.addEventListener('mouseleave', startAuto);
     startAuto();
@@ -404,11 +440,11 @@ const QuotesEngine = (() => {
 })();
 
 /* ============================================================
-   5. REVIEW ENGINE — swipeable carousel + CRUD
+   5. REVIEW ENGINE — swipeable carousel + CRUD (localStorage)
    ============================================================ */
 const ReviewEngine = (() => {
 
-  const STORAGE_KEY = 'frd-reviews-v6'; /* bumped from v5 — clears seeded data */
+  const STORAGE_KEY = 'frd-reviews-v6';
 
   /* ── DOM refs ───────────────────────────────────────────── */
   const track      = document.getElementById('reviews-track');
@@ -423,17 +459,15 @@ const ReviewEngine = (() => {
   const formTitle  = document.getElementById('review-form-title');
   const feedback   = document.getElementById('review-feedback');
   const modal      = document.getElementById('delete-modal');
-  const modalOk    = document.getElementById('modal-confirm');
-  const modalNo    = document.getElementById('modal-cancel');
+  const container  = document.querySelector('.reviews-track-container');
 
   /* ── State ──────────────────────────────────────────────── */
-  let reviews     = [];
-  let current     = 0;
-  let isAnim      = false;
-  let autoTimer   = null;
-  let dragStart   = 0;
-  let isDragging  = false;
-  const PER_PAGE  = 2; /* cards per "slide" on desktop */
+  let reviews    = [];
+  let current    = 0;
+  let isAnim     = false;
+  let autoTimer  = null;
+  let dragStart  = 0;
+  let isDragging = false;
 
   /* ── Storage ────────────────────────────────────────────── */
   const load = () => {
@@ -442,6 +476,7 @@ const ReviewEngine = (() => {
       reviews = raw ? JSON.parse(raw) : [];
       if (!Array.isArray(reviews)) reviews = [];
     } catch (_) { reviews = []; }
+    console.log('Reviews loaded:', reviews);
   };
 
   const save = () => {
@@ -454,40 +489,43 @@ const ReviewEngine = (() => {
   );
 
   /* ── Page count ─────────────────────────────────────────── */
-  const perPage  = () => window.innerWidth <= 768 ? 1 : 2;
-  const pages    = () => Math.max(1, Math.ceil(reviews.length / perPage()));
+  const perPage = () => window.innerWidth <= 768 ? 1 : 2;
+  const pages   = () => Math.max(1, Math.ceil(reviews.length / perPage()));
 
-  /* ── Build track ────────────────────────────────────────── */
+  /* ── Render track ───────────────────────────────────────── */
   const render = () => {
     if (!track) return;
+    console.log('Review container:', container);
     const pp    = perPage();
     const total = pages();
     track.innerHTML = '';
 
-    /* Empty state */
     if (reviews.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'review-card';
       empty.setAttribute('role', 'group');
       empty.innerHTML = `
-        <div class="review-node review-empty-state" style="text-align:center;padding:2.5rem 1.5rem;grid-column:1/-1;">
+        <div class="review-node review-empty-state"
+             style="text-align:center;padding:2.5rem 1.5rem;grid-column:1/-1;">
           <div style="font-size:2.5rem;margin-bottom:1rem;opacity:0.3;">✦</div>
-          <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.6;">No reviews yet. Be the first to share your experience with this book.</p>
+          <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.6;">
+            No reviews yet. Be the first to share your experience with this book.
+          </p>
         </div>`;
       track.appendChild(empty);
       if (curEl) curEl.textContent = '0';
       if (totEl) totEl.textContent = '0';
       if (dotsWrap) dotsWrap.innerHTML = '';
-      const counterEl = document.getElementById('reviews-counter');
-      if (counterEl) counterEl.style.visibility = 'hidden';
-      const navEl = document.querySelector('.reviews-nav');
-      if (navEl) { navEl.querySelector('#reviews-prev').style.visibility = 'hidden'; navEl.querySelector('#reviews-next').style.visibility = 'hidden'; }
+      const ctr = document.getElementById('reviews-counter');
+      if (ctr) ctr.style.visibility = 'hidden';
+      if (prevBtn) prevBtn.style.visibility = 'hidden';
+      if (nextBtn) nextBtn.style.visibility = 'hidden';
       return;
     }
 
-    /* Restore nav visibility */
-    const counterEl = document.getElementById('reviews-counter');
-    if (counterEl) counterEl.style.visibility = '';
+    /* Restore nav */
+    const ctr = document.getElementById('reviews-counter');
+    if (ctr) ctr.style.visibility = '';
     if (prevBtn) prevBtn.style.visibility = '';
     if (nextBtn) nextBtn.style.visibility = '';
 
@@ -497,20 +535,16 @@ const ReviewEngine = (() => {
       page.setAttribute('role', 'group');
       page.setAttribute('aria-roledescription', 'slide');
       page.setAttribute('aria-label', `Reviews page ${p + 1} of ${total}`);
-
-      const slice = reviews.slice(p * pp, p * pp + pp);
-      slice.forEach((rev, localIdx) => {
-        const globalIdx = p * pp + localIdx;
-        page.appendChild(buildCard(rev, globalIdx));
+      reviews.slice(p * pp, p * pp + pp).forEach((rev, li) => {
+        const review = buildCard(rev, p * pp + li);
+        page.appendChild(review);
+        console.log('Review rendered:', review);
       });
-
       track.appendChild(page);
     }
 
-    /* Update counter & dots */
     if (curEl) curEl.textContent = Math.min(current + 1, total);
     if (totEl) totEl.textContent = total;
-
     buildDots(total);
     clampIndex(total);
     applyTransform();
@@ -526,10 +560,14 @@ const ReviewEngine = (() => {
       ${rev.role ? `<span class="review-role">${esc(rev.role)}</span>` : ''}
       <span class="review-date">${esc(rev.date || '')}</span>
       <div class="review-actions" aria-label="Review actions">
-        <button class="review-crud-btn btn-edit-rev" data-action="edit" data-idx="${idx}" aria-label="Edit review by ${esc(rev.name)}">
+        <button class="review-crud-btn btn-edit-rev"
+                data-action="edit" data-idx="${idx}"
+                aria-label="Edit review by ${esc(rev.name)}">
           <i class="fas fa-pen" aria-hidden="true"></i> Edit
         </button>
-        <button class="review-crud-btn btn-delete-rev" data-action="delete" data-idx="${idx}" aria-label="Delete review by ${esc(rev.name)}">
+        <button class="review-crud-btn btn-delete-rev"
+                data-action="delete" data-idx="${idx}"
+                aria-label="Delete review by ${esc(rev.name)}">
           <i class="fas fa-trash" aria-hidden="true"></i> Delete
         </button>
       </div>`;
@@ -544,7 +582,7 @@ const ReviewEngine = (() => {
       dot.className = 'reviews-dot' + (i === current ? ' active' : '');
       dot.setAttribute('role', 'tab');
       dot.setAttribute('aria-label', `Reviews page ${i + 1}`);
-      dot.setAttribute('aria-selected', i === current ? 'true' : 'false');
+      dot.setAttribute('aria-selected', String(i === current));
       dot.addEventListener('click', () => goTo(i));
       dotsWrap.appendChild(dot);
     }
@@ -556,21 +594,18 @@ const ReviewEngine = (() => {
 
   const applyTransform = () => {
     if (track) track.style.transform = `translateX(-${current * 100}%)`;
-
     const total = pages();
     if (curEl) curEl.textContent = Math.min(current + 1, total);
-
-    const dots = dotsWrap ? dotsWrap.querySelectorAll('.reviews-dot') : [];
-    dots.forEach((d, i) => {
+    (dotsWrap ? dotsWrap.querySelectorAll('.reviews-dot') : []).forEach((d, i) => {
       d.classList.toggle('active', i === current);
-      d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+      d.setAttribute('aria-selected', String(i === current));
     });
   };
 
   const goTo = (i) => {
     if (isAnim) return;
     isAnim  = true;
-    current = (i + pages()) % pages();
+    current = ((i % pages()) + pages()) % pages();
     applyTransform();
     setTimeout(() => { isAnim = false; }, 580);
   };
@@ -578,89 +613,67 @@ const ReviewEngine = (() => {
   const next = () => goTo(current + 1);
   const prev = () => goTo(current - 1);
 
-  const startAuto = () => {
-    clearInterval(autoTimer);
-    autoTimer = setInterval(next, 7000);
-  };
+  const startAuto = () => { clearInterval(autoTimer); autoTimer = setInterval(next, 7000); };
   const stopAuto  = () => clearInterval(autoTimer);
 
   /* ── Drag / swipe ───────────────────────────────────────── */
-  const container = document.querySelector('.reviews-track-container');
-  const onDs = x => { dragStart = x; isDragging = true; stopAuto(); };
-  const onDe = x => {
-    if (!isDragging) return;
-    isDragging = false;
-    const d = dragStart - x;
-    if (Math.abs(d) > 50) { d > 0 ? next() : prev(); }
-    startAuto();
-  };
-
-  const bindDrag = () => {
+  const bindDrag  = () => {
     if (!container) return;
+    const onDs = x => { dragStart = x; isDragging = true; stopAuto(); };
+    const onDe = x => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (Math.abs(dragStart - x) > 50) { dragStart - x > 0 ? next() : prev(); }
+      startAuto();
+    };
     container.addEventListener('touchstart', e => onDs(e.changedTouches[0].clientX), { passive: true });
     container.addEventListener('touchend',   e => onDe(e.changedTouches[0].clientX), { passive: true });
     container.addEventListener('mousedown',  e => { e.preventDefault(); onDs(e.clientX); });
-    window.addEventListener   ('mouseup',   e => onDe(e.clientX));
+    window.addEventListener('mouseup', e => onDe(e.clientX));
     container.style.cursor = 'grab';
     container.addEventListener('mousedown', () => { container.style.cursor = 'grabbing'; });
-    window.addEventListener   ('mouseup',  () => { container.style.cursor = 'grab'; });
+    window.addEventListener('mouseup', () => { container.style.cursor = 'grab'; });
   };
 
-  /* ── Delegated click for edit/delete ────────────────────── */
+  /* ── Delegated edit / delete ────────────────────────────── */
   const onTrackClick = (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const idx    = parseInt(btn.dataset.idx, 10);
-    const action = btn.dataset.action;
-    if (action === 'edit')   triggerEdit(idx);
-    if (action === 'delete') triggerDelete(idx);
+    const idx = parseInt(btn.dataset.idx, 10);
+    if (btn.dataset.action === 'edit')   triggerEdit(idx);
+    if (btn.dataset.action === 'delete') triggerDelete(idx);
   };
 
-  /* ── Edit ───────────────────────────────────────────────── */
   const triggerEdit = (idx) => {
     if (isNaN(idx) || idx < 0 || idx >= reviews.length) return;
     const r = reviews[idx];
-    const nameEl  = document.getElementById('rev-name');
-    const titleEl = document.getElementById('rev-title');
-    const textEl  = document.getElementById('rev-text');
-    if (nameEl)  nameEl.value  = r.name  || '';
-    if (titleEl) titleEl.value = r.role  || '';
-    if (textEl)  textEl.value  = r.text  || '';
-    editIdxInp.value   = idx;
-    submitBtn.querySelector('span').textContent = 'Update Review';
-    formTitle.textContent = 'Edit Your Review';
+    const ne = document.getElementById('rev-name');
+    const te = document.getElementById('rev-title');
+    const xe = document.getElementById('rev-text');
+    if (ne) ne.value = r.name || '';
+    if (te) te.value = r.role || '';
+    if (xe) xe.value = r.text || '';
+    if (editIdxInp) editIdxInp.value = idx;
+    const lbl = submitBtn && (submitBtn.querySelector('.rev-btn-label') || submitBtn.querySelector('span'));
+    if (lbl) lbl.textContent = 'Update Review';
+    if (formTitle)  formTitle.textContent = 'Edit Your Review';
     clearFb();
-    document.getElementById('review-form-section') &&
-      document.getElementById('review-form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('review-form-section')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  /* ── Delete modal ───────────────────────────────────────── */
   const triggerDelete = (idx) => {
     if (!modal) return;
     modal.removeAttribute('hidden');
-    requestAnimationFrame(() => modal.removeAttribute('hidden'));
-
-    const newOk = modalOk.cloneNode(true);
-    const newNo = modalNo.cloneNode(true);
-    modalOk.replaceWith(newOk);
-    modalNo.replaceWith(newNo);
-
-    const close = () => {
-      modal.setAttribute('hidden', '');
-      document.removeEventListener('keydown', onEsc);
-    };
-
+    const ok = document.getElementById('modal-confirm');
+    const no = document.getElementById('modal-cancel');
+    if (!ok || !no) return;
+    const newOk = ok.cloneNode(true);
+    const newNo = no.cloneNode(true);
+    ok.replaceWith(newOk); no.replaceWith(newNo);
+    const close = () => { modal.setAttribute('hidden', ''); document.removeEventListener('keydown', onEsc); };
     const onEsc = e => { if (e.key === 'Escape') close(); };
-
-    newOk.addEventListener('click', () => {
-      close();
-      reviews.splice(idx, 1);
-      save();
-      current = 0;
-      render();
-      resetForm();
-    });
-
+    newOk.addEventListener('click', () => { close(); reviews.splice(idx, 1); save(); current = 0; render(); resetForm(); });
     newNo.addEventListener('click', close);
     modal.addEventListener('click', e => { if (e.target === modal) close(); }, { once: true });
     document.addEventListener('keydown', onEsc);
@@ -671,20 +684,20 @@ const ReviewEngine = (() => {
   const showFb = (msg, type) => {
     if (!feedback) return;
     feedback.textContent = msg;
-    feedback.className   = 'form-feedback ' + type;
+    feedback.className = 'form-feedback ' + type;
     if (type === 'success') setTimeout(clearFb, 5000);
   };
   const clearFb = () => {
     if (!feedback) return;
     feedback.textContent = '';
-    feedback.className   = 'form-feedback';
+    feedback.className = 'form-feedback';
   };
 
-  /* ── Reset form ─────────────────────────────────────────── */
   const resetForm = () => {
     if (form) form.reset();
-    editIdxInp.value = '';
-    if (submitBtn) submitBtn.querySelector('span').textContent = 'Publish Review';
+    if (editIdxInp) editIdxInp.value = '';
+    const lbl = submitBtn && (submitBtn.querySelector('.rev-btn-label') || submitBtn.querySelector('span'));
+    if (lbl) lbl.textContent = 'Publish Review';
     if (formTitle) formTitle.textContent = 'Leave an Impression';
     clearFb();
   };
@@ -694,13 +707,13 @@ const ReviewEngine = (() => {
     if (!form) return;
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const name  = (document.getElementById('rev-name')?.value  || '').trim();
-      const role  = (document.getElementById('rev-title')?.value || '').trim();
-      const text  = (document.getElementById('rev-text')?.value  || '').trim();
-      const eidx  = editIdxInp.value;
+      const name = (document.getElementById('rev-name')?.value  || '').trim();
+      const role = (document.getElementById('rev-title')?.value || '').trim();
+      const text = (document.getElementById('rev-text')?.value  || '').trim();
+      const eidx = editIdxInp ? editIdxInp.value : '';
 
-      if (!name) { showFb('Please enter your name.', 'error');   document.getElementById('rev-name')?.focus();  return; }
-      if (!text) { showFb('Please write a review.',  'error');   document.getElementById('rev-text')?.focus();  return; }
+      if (!name) { showFb('Please enter your name.', 'error'); document.getElementById('rev-name')?.focus(); return; }
+      if (!text) { showFb('Please write a review.',  'error'); document.getElementById('rev-text')?.focus(); return; }
 
       const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       const obj   = { name, role, text, date: today };
@@ -708,8 +721,8 @@ const ReviewEngine = (() => {
       if (eidx !== '') {
         const i = parseInt(eidx, 10);
         if (!isNaN(i) && i >= 0 && i < reviews.length) {
-          obj.date     = reviews[i].date || today;
-          reviews[i]   = obj;
+          obj.date   = reviews[i].date || today;
+          reviews[i] = obj;
         }
       } else {
         reviews.unshift(obj);
@@ -720,11 +733,13 @@ const ReviewEngine = (() => {
       render();
       resetForm();
       showFb('Your review has been published.', 'success');
-      ToastEngine.show('Your review has been published successfully.', 'success', 6000);
+      if (typeof ToastEngine !== 'undefined') {
+        ToastEngine.show('Your review has been published successfully.', 'success', 6000);
+      }
     });
   };
 
-  /* ── Resize: re-render so per-page adapts ───────────────── */
+  /* ── Resize ─────────────────────────────────────────────── */
   let resizeTimer;
   const onResize = () => {
     clearTimeout(resizeTimer);
@@ -736,18 +751,15 @@ const ReviewEngine = (() => {
     render();
     bindDrag();
     initForm();
-
     prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
     nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
     track   && track.addEventListener('click', onTrackClick);
-
     window.addEventListener('resize', onResize, { passive: true });
     startAuto();
   };
 
   return { init };
 })();
-
 
 /* ============================================================
    6. CONTACT ENGINE

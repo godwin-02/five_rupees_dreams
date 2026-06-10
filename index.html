@@ -368,8 +368,8 @@
                     <i class="fas fa-chevron-right" aria-hidden="true"></i>
                 </button>
 
-                <div class="gallery-dots" id="gallery-dots" role="tablist" aria-label="Gallery navigation">
-                    <!-- Injected by JS -->
+                <div class="gallery-counter-wrap" id="gallery-dots" aria-live="polite" aria-atomic="true">
+                    <span class="gallery-counter-text" id="gallery-counter-display">01 / 01</span>
                 </div>
             </div>
         </section>
@@ -420,18 +420,17 @@
                                 <label for="rev-name">Your Name <span aria-hidden="true">*</span></label>
                                 <input type="text" id="rev-name" name="rev-name" placeholder="Full Name" autocomplete="name" required aria-required="true">
                             </div>
-                             
                         </div>
                         <div class="form-field">
                             <label for="rev-text">Your Review <span aria-hidden="true">*</span></label>
-                            <textarea id="rev-text" name="rev-text" rows="4" placeholder="Share your transformational experience with this book..." required aria-required="true"></textarea>
+                            <textarea id="rev-text" name="rev-text" rows="4" placeholder="Share your  experience with this book..." required aria-required="true"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary" id="rev-submit-btn">
                             <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                            <span>Publish Review</span>
+                            <span class="rev-btn-label">Publish Review</span>
                         </button>
                     </form>
-                </div>
+                </div> 
             </div>
         </section>
 

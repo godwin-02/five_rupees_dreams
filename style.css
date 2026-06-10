@@ -975,17 +975,15 @@ html, body {
 .gallery-prev { left: clamp(12px, 3vw, 22px); }
 .gallery-next { right: clamp(12px, 3vw, 22px); }
 
-/* Dots — repositioned BELOW image viewport, not overlapping */
+/* Dots — absolute inside viewport (works at all sizes now) */
 .gallery-dots {
-  position: relative;   /* pull out of absolute stacking on mobile */
-  bottom: auto;
-  left: auto;
-  transform: none;
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   gap: 6px;
-  justify-content: center;
   z-index: 10;
-  padding: 10px 0 4px;
 }
 
 /* Re-apply absolute only on desktop where there's room inside the frame */
@@ -1747,6 +1745,7 @@ html, body {
   .review-node     { padding: 1.5rem 1.25rem; }
   .review-form-wrapper { padding: 1.5rem 1.25rem; }
   .form-row        { grid-template-columns: 1fr; gap: 0; }
+  #review-form .btn { width: 100%; justify-content: center; }
 
   /* Publisher */
   .publisher-split  { grid-template-columns: 1fr; gap: 1.75rem; }
@@ -2850,7 +2849,6 @@ html, body {
 .media-grid .media-card,
 .speaking-topics-grid .speaking-topic-card,
 .contact-cards-grid .luxury-card,
-.reviews-track .review-node,
 .author-highlights .author-highlight-item {
   opacity: 0;
   transform: translateY(50px);
@@ -3642,24 +3640,71 @@ html, body {
    2. GALLERY SAFE-ZONE — dots below image, not overlapping faces
    ────────────────────────────────────────────────────────────────────────── */
 
-/* On mobile: let gallery-viewport overflow visible at bottom so dots show */
+/* On mobile: gallery-viewport MUST keep overflow:hidden for translateX to work.
+   Dots are moved outside by making gallery-section a flex column. */
 @media (max-width: 768px) {
   .gallery-section {
-    overflow: visible; /* allow dots to sit below viewport */
+    overflow: hidden; /* MUST stay hidden — translateX carousel requires this */
+    display: block;
   }
 
+  /* Viewport: keep overflow:hidden so slides clip correctly */
   .gallery-viewport {
-    overflow: visible;         /* dots flow below frame */
+    overflow: hidden; /* DO NOT change — breaking this hides all images */
     border-radius: 10px;
   }
 
-  /* Clip only the image track, not the dot row */
+  /* Track: explicit height on mobile so height:100% on slides resolves */
   .gallery-track {
-    border-radius: 10px;
+    height: clamp(240px, 62vw, 360px) !important;
+    overflow: visible; /* allow captions to render */
+  }
+
+  /* Slides: must fill track height explicitly */
+  .gallery-slide {
+    min-width: 100%;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
     overflow: hidden;
   }
 
-  /* Dots: sit below image, centered, no overlap */
+  /* Images: fill slide */
+  .gallery-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+  }
+
+  /* Dots: inside viewport at bottom (position:absolute works fine here) */
+  .gallery-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0;
+    padding-bottom: 0;
+    gap: 5px;
+    z-index: 10;
+  }
+
+  /* Caption: keep readable, safe padding so text clears dots */
+  .gallery-caption {
+    padding: 2.5rem 1.25rem 1.75rem;
+    border-radius: 0;
+  }
+
+  .gallery-caption h5 {
+    font-size: clamp(0.88rem, 3.5vw, 1.05rem);
+    margin-bottom: 0.2rem;
+  }
+
+  .gallery-caption p {
+    display: none; /* hide long desc on mobile to keep caption clean */
+  }
+}  /* Dots: sit below image, centered, no overlap */
   .gallery-dots {
     position: relative;
     bottom: auto;
@@ -3975,5 +4020,167 @@ img {
   .publisher-split > *,
   .contact-cards-grid > * {
     min-width: 0;
+  }
+}
+
+/* ==========================================================================
+   GALLERY COUNTER — replaces dot pagination
+   ========================================================================== */
+
+/* Hide any residual dot elements */
+.gallery-dots .gallery-dot,
+.gallery-dot { display: none !important; }
+
+/* Counter wrapper — positioned inside viewport bottom-right */
+.gallery-counter-wrap {
+  position: absolute;
+  bottom: 18px;
+  right: 20px;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.gallery-counter-text {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.55);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(212,175,55,0.22);
+  display: inline-block;
+  transition: color 0.3s;
+  /* Gold accent on the current number */
+  white-space: nowrap;
+}
+
+/* Highlight the current number gold */
+.gallery-counter-text::first-line {
+  color: var(--gold-hi);
+}
+
+/* Viewport hover: make counter more visible */
+.gallery-viewport:hover .gallery-counter-text {
+  color: rgba(255,255,255,0.85);
+  border-color: rgba(212,175,55,0.5);
+}
+
+/* is-dragging class set by JS */
+.gallery-viewport.is-dragging { cursor: grabbing !important; }
+
+@media (max-width: 768px) {
+  .gallery-counter-wrap {
+    bottom: 10px;
+    right: 12px;
+  }
+  .gallery-counter-text {
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    letter-spacing: 0.14em;
+  }
+}
+
+/* ==========================================================================
+   REVIEW CARDS — premium themed design
+   ========================================================================== */
+
+/* Ensure review-node always uses premium surface */
+.review-node {
+  background: #ffffff;
+  border: 1px solid rgba(212,175,55,0.18);
+  border-radius: 12px;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.04),
+    0 8px 28px rgba(212,175,55,0.07);
+  transition: border-color 0.35s var(--ease-lux),
+              box-shadow 0.35s var(--ease-lux),
+              transform 0.35s var(--ease-lux);
+}
+
+@media (hover: hover) {
+  .review-node:hover {
+    border-color: rgba(212,175,55,0.38);
+    box-shadow:
+      0 4px 16px rgba(0,0,0,0.06),
+      0 14px 40px rgba(212,175,55,0.13);
+    transform: translateY(-3px);
+  }
+}
+
+/* Decorative quote mark */
+.review-node::before {
+  content: '\201C';
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  font-family: var(--font-serif);
+  font-size: 4.5rem;
+  color: rgba(212,175,55,0.07);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.review-stars {
+  color: var(--gold-hi);
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.85rem;
+  display: block;
+}
+
+.review-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(0.94rem, 1.8vw, 1.08rem);
+  line-height: 1.72;
+  color: var(--text-primary);
+  margin-bottom: 1.4rem;
+  flex: 1;
+}
+
+.review-author {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.15rem;
+  letter-spacing: 0.02em;
+}
+
+.review-role {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-hi);
+}
+
+.review-date {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+  letter-spacing: 0.05em;
+}
+
+/* Empty state */
+.review-empty-state {
+  border: 1px dashed rgba(212,175,55,0.2);
+  background: var(--surface);
+}
+
+/* ==========================================================================
+   REVIEW FORM — role field responsive layout
+   ========================================================================== */
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
