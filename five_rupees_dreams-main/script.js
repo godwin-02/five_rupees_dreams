@@ -1,0 +1,1490 @@
+/**
+ * THE FIVE RUPEES DREAMS — Francis Soundararajan
+ * Premium Author Platform · Complete Interaction Engine
+ * =========================================================
+ * Modules:
+ *  1. NavEngine        — scroll effects, spy, mobile drawer
+ *  2. GalleryEngine    — swipe + drag gallery with captions
+ *  3. QuotesEngine     — book excerpt carousel
+ *  4. ReviewEngine     — swipeable review carousel + CRUD (localStorage)
+ *  5. ContactEngine    — EmailJS / FormSubmit delivery
+ *  6. UtilEngine       — scroll reveals, back-to-top, footer year
+ */
+
+'use strict';
+
+document.addEventListener('DOMContentLoaded', () => {
+
+/* ============================================================
+   1. NAV ENGINE
+   ============================================================ */
+const NavEngine = (() => {
+  const nav        = document.getElementById('main-nav');
+  const toggle     = document.getElementById('menu-toggle');
+  const drawer     = document.getElementById('nav-drawer');
+  const overlay    = document.getElementById('nav-overlay');
+  const progress   = document.getElementById('scroll-progress');
+  const backTop    = document.getElementById('back-to-top');
+  const navLinks   = document.querySelectorAll('.nav-links a');
+  const sections   = document.querySelectorAll('main section[id]');
+  const html       = document.documentElement;
+
+  /* Scroll progress + nav shrink + back-to-top */
+  const onScroll = () => {
+    const scrollY   = window.scrollY;
+    const maxScroll = html.scrollHeight - window.innerHeight;
+    if (progress && maxScroll > 0) {
+      progress.style.width = ((scrollY / maxScroll) * 100) + '%';
+    }
+    nav  && nav.classList.toggle('scrolled', scrollY > 40);
+    backTop && backTop.classList.toggle('visible', scrollY > 500);
+  };
+
+  /* Scroll spy */
+  const initSpy = () => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          navLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
+    sections.forEach(s => obs.observe(s));
+  };
+
+  /* Mobile drawer */
+  const openDrawer = () => {
+    drawer  && drawer.classList.add('open');
+    overlay && overlay.classList.add('active');
+    toggle  && toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    /* Move keyboard focus into the drawer for accessibility */
+    const firstLink = drawer && drawer.querySelector('.nav-links a');
+    if (firstLink) firstLink.focus({ preventScroll: true });
+  };
+
+  const closeDrawer = (returnFocus) => {
+    const wasOpen = !!(drawer && drawer.classList.contains('open'));
+    drawer  && drawer.classList.remove('open');
+    overlay && overlay.classList.remove('active');
+    toggle  && toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    /* Return focus to the toggle when closed via keyboard / overlay */
+    if (returnFocus && wasOpen && toggle) toggle.focus({ preventScroll: true });
+  };
+
+  const init = () => {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    initSpy();
+
+    toggle  && toggle.addEventListener('click', () => {
+      drawer && drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+
+    overlay && overlay.addEventListener('click', () => closeDrawer(true));
+
+    navLinks.forEach(a => a.addEventListener('click', () => closeDrawer(false)));
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeDrawer(true);
+    });
+
+    backTop && backTop.addEventListener('click', () =>
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    );
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   3. GALLERY ENGINE
+   ============================================================ */
+const GalleryEngine = (() => {
+
+  const ITEMS = [
+    // 1. NGO / Ministry
+    {
+      src: './images/the ngo.jpg',
+      title: 'Community Service',
+      caption: 'Serving communities through compassion, education, and hope.',
+      desc: 'Demonstrating the grassroots humanitarian operations and community development initiatives led by the author.'
+    },
+    // 2. Publisher
+    {
+      src: './images/John and Uta the Publishers.JPG',
+      title: 'Publishing Partners',
+      caption: 'A remarkable friendship that transformed into a publishing journey.',
+      desc: 'Jürgen John and Uta John — the dedicated publishing team behind distributing The Five Rupees Dreams to the global stage.'
+    },
+    // 3. Parents
+    {
+      src: './images/author-parents.jpeg',
+      title: 'Sacred Ancestry',
+      caption: 'The roots of faith, sacrifice, and perseverance.',
+      desc: "A portrait of the author's parents, whose early lessons in faith and resilience shaped his lifelong mission."
+    },
+    // 4. In-Laws
+    {
+      src: './images/author-inlaw.jpeg',
+      title: 'Extended Legacies',
+      caption: 'Extended family whose encouragement strengthened the journey.',
+      desc: 'Celebrating heritage and family unity woven across generations.'
+    },
+    // 5. Family gathering
+    {
+      src: './images/family-gathering.jpeg',
+      title: 'Family Gathering',
+      caption: 'Moments of togetherness and celebration.',
+      desc: 'Together in love and laughter — a family gathering that echoes the warmth woven throughout this biography.'
+    },
+    // 6. Cute family
+    {
+      src: './images/cute family.jpeg',
+      title: 'Joyful Family Moments',
+      caption: 'The warmth and joy of family life.',
+      desc: 'A beautiful reminder that the greatest gifts in life are the people we share our journey with.'
+    },
+    // 7. Author family
+    {
+      src: './images/author-family.jpeg',
+      title: 'Foundational Support',
+      caption: 'The people who stood beside every chapter of the story.',
+      desc: 'Francis pictured with his loving family — his primary source of inspiration and strength in both ministry and writing.'
+    },
+    // 8. Author daughter
+    {
+      src: './images/author-daughter.jpeg',
+      title: 'A Father\'s Pride',
+      caption: 'A father\'s pride and a source of inspiration.',
+      desc: 'Cherishing moments of family life amidst the author\'s busy global commitments.'
+    },
+    // 9. Author with wife and publisher
+    {
+      src: './images/author with his wife and publisher.jpg',
+      title: 'Family & Vision',
+      caption: 'A meeting of friendship, family, and vision.',
+      desc: 'Commemorating the official milestone of bringing this transformational biography to print alongside loved ones.'
+    },
+    // 10. Author wife cherishing moments
+    {
+      src: './images/author wife cherishing moments.jpg',
+      title: 'Cherished Moments',
+      caption: 'Cherished memories that shaped life\'s journey.',
+      desc: 'Celebrating the quiet strength and partnership of marriage that has anchored decades of community leadership.'
+    },
+    // 11. Author old family photo
+    {
+      src: './images/author old family photo.jpg',
+      title: 'Early Memories',
+      caption: 'A glimpse into earlier years and treasured memories.',
+      desc: 'A precious historic glimpse into the family structure that nurtured Francis\'s dreams from a five-rupees beginning.'
+    },
+    // 12. Brothers
+    {
+      src: './images/brothers.jpeg',
+      title: 'Brotherhood',
+      caption: 'Shared bonds, shared struggles, shared dreams.',
+      desc: 'The unbreakable bond between brothers — a story of solidarity, love, and mutual encouragement across every season of life.'
+    },
+    // 13. Sister
+    {
+      src: './images/sister.jpeg',
+      title: 'A Sister\'s Love',
+      caption: 'Family support that remained constant through every season.',
+      desc: 'A cherished family portrait reflecting the deep bonds that shaped the author\'s journey from the very beginning.'
+    },
+    // 14. Remaining
+    {
+      src: './images/jubilee of Fr.Nelson.jpeg',
+      title: 'Jubilee Celebration',
+      caption: 'A joyful milestone honoring faith, service, and dedication.',
+      desc: 'Marking years of faithful service — a jubilee that reflects the enduring spirit of pastoral commitment and community.'
+    },
+    {
+      src: './images/Thooya with Fr. Nelson.jpeg',
+      title: 'Thooya & Fr. Nelson',
+      caption: 'A memorable moment of encouragement, learning, and friendship.',
+      desc: 'A cherished encounter that bridged hearts and deepened the bonds of ecumenical fellowship and mutual respect.'
+    },
+    {
+      src: './images/author with fr Nelson.JPG',
+      title: 'Friendship & Guidance',
+      caption: 'Meaningful moments with mentors who inspired growth and purpose.',
+      desc: 'Strengthening ecumenical bonds and sharing a vision of pastoral care and chaplaincy worldwide.'
+    },
+    {
+      src: './images/Grandchild.jpeg',
+      title: 'Generations of Hope',
+      caption: 'A reminder that every journey continues through future generations.',
+      desc: 'The story does not end — it is carried forward with joy, innocence, and the promise of tomorrow.'
+    },
+    {
+      src: './images/grandmother.jpeg',
+      title: 'Beloved Grandmother',
+      caption: 'Wisdom, sacrifice, and unconditional love across generations.',
+      desc: 'A portrait honouring the quiet strength of a grandmother whose love laid the foundation for everything that followed.'
+    }
+  ];
+
+  const track    = document.getElementById('gallery-track');
+  const prevBtn  = document.getElementById('gallery-prev');
+  const nextBtn  = document.getElementById('gallery-next');
+  const dotsWrap = document.getElementById('gallery-dots');
+  const viewport = document.querySelector('.gallery-viewport');
+
+  let current      = 0;
+  let isAnimating  = false;
+  let autoTimer    = null;
+  let dragStart    = 0;
+  let isDragging   = false;
+
+  const total = ITEMS.length;
+
+  const buildSlides = () => {
+    if (!track) return;
+    track.innerHTML = '';
+
+    ITEMS.forEach((item, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'gallery-slide';
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', `Photo ${i + 1} of ${total}: ${item.title}`);
+
+      const img = document.createElement('img');
+      img.src     = item.src;
+      img.alt     = item.caption;
+      img.loading = i === 0 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      if (item.fallback) img.onerror = () => { img.src = item.fallback; };
+
+      const cap = document.createElement('div');
+      cap.className = 'gallery-caption';
+      cap.setAttribute('aria-hidden', 'true');
+      cap.innerHTML = `<h5>${item.title}</h5><p>${item.caption} — ${item.desc}</p>`;
+
+      slide.appendChild(img);
+      slide.appendChild(cap);
+      track.appendChild(slide);
+    });
+  };
+
+  const counterDisplay = document.getElementById('gallery-counter-display');
+
+  const pad = n => String(n).padStart(2, '0');
+
+  const buildCounter = () => {
+    /* dots container now holds the counter — nothing to inject */
+    updateCounter();
+  };
+
+  const updateCounter = () => {
+    if (counterDisplay) {
+      counterDisplay.textContent = `${pad(current + 1)} / ${pad(total)}`;
+    }
+  };
+
+  const updateUI = () => {
+    updateCounter();
+  };
+
+  const goTo = (index) => {
+    if (isAnimating || index === current) return;
+    isAnimating = true;
+    current = (index + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    updateUI();
+    setTimeout(() => { isAnimating = false; }, 580);
+  };
+
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  const startAuto = () => {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(next, 5500);
+  };
+
+  const stopAuto = () => clearInterval(autoTimer);
+
+  /* ── Premium live-drag with momentum ── */
+  let dragOriginX   = 0;
+  let dragLiveX     = 0;
+  let dragOriginTx  = 0;
+
+  const getTx = () => -(current * 100); /* % */
+
+  const onDragStart = (x) => {
+    if (isAnimating) return;
+    dragStart     = x;
+    dragOriginX   = x;
+    dragLiveX     = x;
+    dragOriginTx  = getTx();
+    isDragging    = true;
+    stopAuto();
+    track.style.transition = 'none';
+    viewport && viewport.classList.add('is-dragging');
+  };
+
+  const onDragMove = (x) => {
+    if (!isDragging) return;
+    dragLiveX = x;
+    const vw      = viewport ? viewport.offsetWidth : window.innerWidth;
+    const deltaPx = x - dragOriginX;
+    const deltaPc = (deltaPx / vw) * 100;
+    /* Edge resistance */
+    let resistance = 1;
+    if ((current === 0 && deltaPx > 0) || (current === total - 1 && deltaPx < 0)) {
+      resistance = 0.22;
+    }
+    track.style.transform = `translateX(${dragOriginTx + deltaPc * resistance}%)`;
+  };
+
+  const onDragEnd = (x) => {
+    if (!isDragging) return;
+    isDragging = false;
+    viewport && viewport.classList.remove('is-dragging');
+    track.style.transition = '';
+    const vw    = viewport ? viewport.offsetWidth : window.innerWidth;
+    const delta = dragOriginX - x;
+    const threshold = vw * 0.12;
+    if (Math.abs(delta) > threshold) {
+      delta > 0 ? next() : prev();
+    } else {
+      track.style.transform = `translateX(${getTx()}%)`;
+    }
+    startAuto();
+  };
+
+  const bindDrag = () => {
+    if (!viewport) return;
+
+    /* Touch */
+    viewport.addEventListener('touchstart', e => onDragStart(e.changedTouches[0].clientX), { passive: true });
+    viewport.addEventListener('touchmove',  e => onDragMove(e.changedTouches[0].clientX),  { passive: true });
+    viewport.addEventListener('touchend',   e => onDragEnd(e.changedTouches[0].clientX),   { passive: true });
+    viewport.addEventListener('touchcancel',() => onDragEnd(dragLiveX),                    { passive: true });
+
+    /* Mouse */
+    viewport.addEventListener('mousedown', e => { e.preventDefault(); onDragStart(e.clientX); });
+    window.addEventListener('mousemove',   e => { if (isDragging) onDragMove(e.clientX); }, { passive: true });
+    window.addEventListener('mouseup',     e => onDragEnd(e.clientX));
+    window.addEventListener('mouseleave',  () => { if (isDragging) onDragEnd(dragLiveX); });
+
+    viewport.style.cursor = 'grab';
+    viewport.addEventListener('mousedown', () => { viewport.style.cursor = 'grabbing'; });
+    window.addEventListener('mouseup',     () => { viewport.style.cursor = 'grab'; });
+  };
+
+  const init = () => {
+    if (!track) return;
+    buildSlides();
+    buildCounter();
+    track.style.transform = 'translateX(0)';
+
+    prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
+    nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
+
+    document.addEventListener('keydown', e => {
+      if (!viewport) return;
+      const r = viewport.getBoundingClientRect();
+      if (r.top > window.innerHeight || r.bottom < 0) return;
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight') { next(); startAuto(); }
+      if (e.key === 'ArrowLeft')  { prev(); startAuto(); }
+    });
+
+    bindDrag();
+    viewport && viewport.addEventListener('mouseenter', stopAuto);
+    viewport && viewport.addEventListener('mouseleave', startAuto);
+    startAuto();
+  };
+
+  return { init };
+})();
+
+
+/* ============================================================
+   4. QUOTES ENGINE (Book excerpts)
+   ============================================================ */
+const QuotesEngine = (() => {
+  const slides  = document.querySelectorAll('.quote-slide');
+  const dots    = document.querySelectorAll('.quote-dot');
+  let current   = 0;
+  let timer     = null;
+
+  const goTo = (i) => {
+    slides[current].classList.remove('active');
+    dots[current]  && dots[current].classList.remove('active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current]  && dots[current].classList.add('active');
+  };
+
+  const init = () => {
+    if (!slides.length) return;
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => { goTo(i); resetTimer(); });
+    });
+
+    const resetTimer = () => {
+      clearInterval(timer);
+      timer = setInterval(() => goTo(current + 1), 6000);
+    };
+
+    resetTimer();
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   FIREBASE REVIEWS — optional shared storage (Firestore)
+   ------------------------------------------------------------
+   Only activates when the project owner fills in FIREBASE_CONFIG
+   below with their own Firebase project credentials. Until then
+   the website uses the original localStorage review store and
+   makes NO external requests (the SDK is loaded on demand only
+   when a real config is present). See FIREBASE_SETUP.md.
+   ============================================================ */
+const FirebaseReviews = (() => {
+
+  /* Firebase Web config — these are PUBLIC client values, NOT
+     service-account keys. Replace the placeholders with your own
+     project's values from Firebase Console → Project settings. */
+  const FIREBASE_CONFIG = {
+    apiKey:            "YOUR_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+  };
+
+  const COLLECTION   = 'five-rupees-reviews';
+  const SDK_VERSION  = '10.12.2';   /* pinned; gstatic CDN keeps old versions */
+
+  let app   = null;
+  let db    = null;
+  let ready = false;
+  let unsub = null;
+
+  const isConfigured = () => {
+    const c = FIREBASE_CONFIG;
+    return !!(c.apiKey && c.projectId &&
+              String(c.apiKey).indexOf('YOUR_') !== 0 &&
+              String(c.projectId).indexOf('YOUR_') !== 0);
+  };
+
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src   = src;
+    s.async = true;
+    s.onload  = () => resolve();
+    s.onerror = () => reject(new Error('Failed to load ' + src));
+    document.head.appendChild(s);
+  });
+
+  const init = async () => {
+    if (ready) return db;
+    if (!isConfigured()) throw new Error('Firebase not configured');
+
+    /* Load the compat SDK dynamically — only when configured */
+    if (typeof window.firebase === 'undefined') {
+      await loadScript(`https://www.gstatic.com/firebasejs/${SDK_VERSION}/firebase-app-compat.js`);
+      await loadScript(`https://www.gstatic.com/firebasejs/${SDK_VERSION}/firebase-firestore-compat.js`);
+    }
+    if (!window.firebase || !window.firebase.firestore) {
+      throw new Error('Firebase SDK unavailable');
+    }
+
+    app = window.firebase.initializeApp(FIREBASE_CONFIG);
+    db  = window.firebase.firestore();
+    ready = true;
+    return db;
+  };
+
+  /* Live subscription → cb(list, error). list is newest-first. */
+  const subscribe = (cb) => {
+    if (!ready || !db) { cb([], new Error('Firestore not ready')); return; }
+    if (unsub) { try { unsub(); } catch (_) {} }
+    try {
+      unsub = db.collection(COLLECTION)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(
+                  (snap) => {
+                    const list = [];
+                    snap.forEach((doc) => {
+                      const d = doc.data() || {};
+                      list.push({
+                        id: doc.id,
+                        name: d.name || '',
+                        role: d.role || '',
+                        text: d.text || '',
+                        date: d.date || '',
+                        createdAt: d.createdAt || null
+                      });
+                    });
+                    cb(list, null);
+                  },
+                  (err) => cb([], err)
+                );
+    } catch (err) {
+      cb([], err);
+    }
+  };
+
+  const add = async (payload) => {
+    if (!ready || !db) throw new Error('Firestore not ready');
+    const ref = await db.collection(COLLECTION).add(payload);
+    return ref.id;
+  };
+
+  const update = async (id, payload) => {
+    if (!ready || !db) throw new Error('Firestore not ready');
+    await db.collection(COLLECTION).doc(String(id)).update(payload);
+  };
+
+  const remove = async (id) => {
+    if (!ready || !db) throw new Error('Firestore not ready');
+    await db.collection(COLLECTION).doc(String(id)).delete();
+  };
+
+  return { isConfigured, init, subscribe, add, update, remove };
+})();
+
+/* ============================================================
+   5. REVIEW ENGINE — swipeable carousel + shared reviews
+   ------------------------------------------------------------
+   Storage strategy (UI and interaction flow unchanged):
+     • Firebase configured & reachable → Firestore is the source
+       of truth; reviews are shared across all visitors.
+     • Otherwise → original localStorage store (frd-reviews-v6).
+   Each review carries a stable `id`. Edit/Delete are only offered
+   on reviews created in THIS browser (tracked in frd-reviews-mine)
+   so visitors cannot modify other people's shared reviews.
+   ============================================================ */
+const ReviewEngine = (() => {
+
+  const STORAGE_KEY = 'frd-reviews-v6';   /* local store / Firestore cache */
+  const MINE_KEY    = 'frd-reviews-mine'; /* ids created in this browser */
+
+  /* ── DOM refs ───────────────────────────────────────────── */
+  const track      = document.getElementById('reviews-track');
+  const prevBtn    = document.getElementById('reviews-prev');
+  const nextBtn    = document.getElementById('reviews-next');
+  const dotsWrap   = document.getElementById('reviews-dots');
+  const curEl      = document.getElementById('rev-current');
+  const totEl      = document.getElementById('rev-total');
+  const form       = document.getElementById('review-form');
+  const editIdxInp = document.getElementById('rev-edit-index');
+  const submitBtn  = document.getElementById('rev-submit-btn');
+  const formTitle  = document.getElementById('review-form-title');
+  const feedback   = document.getElementById('review-feedback');
+  const modal      = document.getElementById('delete-modal');
+  const container  = document.querySelector('.reviews-track-container');
+
+  /* ── State ──────────────────────────────────────────────── */
+  let reviews      = [];
+  let myIds        = new Set();
+  let fbReady      = false;        /* true once Firestore is live */
+  let current      = 0;
+  let isAnim       = false;
+  let autoTimer    = null;
+  let dragStart    = 0;
+  let isDragging   = false;
+
+  /* ── Local storage helpers ─────────────────────────────── */
+  const loadLocal = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      reviews = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(reviews)) reviews = [];
+      /* Ensure every cached/local review has a stable id */
+      reviews.forEach(r => { if (!r.id) r.id = genId(); });
+    } catch (_) { reviews = []; }
+  };
+
+  const saveLocal = () => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews)); } catch (_) {}
+  };
+
+  const loadMine = () => {
+    try {
+      const raw = localStorage.getItem(MINE_KEY);
+      myIds = new Set(raw ? JSON.parse(raw) : []);
+    } catch (_) { myIds = new Set(); }
+  };
+
+  const saveMine = () => {
+    try { localStorage.setItem(MINE_KEY, JSON.stringify([...myIds])); } catch (_) {}
+  };
+
+  const addMine = (id) => { if (id) { myIds.add(id); saveMine(); } };
+
+  /* ── XSS guard ──────────────────────────────────────────── */
+  const esc = s => String(s || '').replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[c])
+  );
+
+  /* ── ID generation (local mode + cache keys) ───────────── */
+  const genId = () => 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+
+  /* ── Is a review editable from this browser? ──────────── */
+  const isMine = (rev) => {
+    if (!rev || !rev.id) return false;
+    /* In local mode every review originated here → editable (preserves old UX) */
+    if (!fbReady) return true;
+    return myIds.has(rev.id);
+  };
+
+  /* ── Page count ─────────────────────────────────────────── */
+  const perPage = () => window.innerWidth <= 768 ? 1 : 2;
+  const pages   = () => Math.max(1, Math.ceil(reviews.length / perPage()));
+
+  /* ── Render track ───────────────────────────────────────── */
+  const render = () => {
+    if (!track) return;
+    const pp    = perPage();
+    const total = pages();
+    track.innerHTML = '';
+
+    if (reviews.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'review-card';
+      empty.setAttribute('role', 'group');
+      empty.innerHTML = `
+        <div class="review-node review-empty-state"
+             style="text-align:center;padding:2.5rem 1.5rem;grid-column:1/-1;">
+          <div style="font-size:2.5rem;margin-bottom:1rem;opacity:0.3;">✦</div>
+          <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.6;">
+            No reviews yet. Be the first to share your experience with this book.
+          </p>
+        </div>`;
+      track.appendChild(empty);
+      if (curEl) curEl.textContent = '0';
+      if (totEl) totEl.textContent = '0';
+      if (dotsWrap) dotsWrap.innerHTML = '';
+      const ctr = document.getElementById('reviews-counter');
+      if (ctr) ctr.style.visibility = 'hidden';
+      if (prevBtn) prevBtn.style.visibility = 'hidden';
+      if (nextBtn) nextBtn.style.visibility = 'hidden';
+      return;
+    }
+
+    /* Restore nav */
+    const ctr = document.getElementById('reviews-counter');
+    if (ctr) ctr.style.visibility = '';
+    if (prevBtn) prevBtn.style.visibility = '';
+    if (nextBtn) nextBtn.style.visibility = '';
+
+    for (let p = 0; p < total; p++) {
+      const page = document.createElement('div');
+      page.className = 'review-card';
+      page.setAttribute('role', 'group');
+      page.setAttribute('aria-roledescription', 'slide');
+      page.setAttribute('aria-label', `Reviews page ${p + 1} of ${total}`);
+      reviews.slice(p * pp, p * pp + pp).forEach((rev) => {
+        page.appendChild(buildCard(rev));
+      });
+      track.appendChild(page);
+    }
+
+    if (curEl) curEl.textContent = Math.min(current + 1, total);
+    if (totEl) totEl.textContent = total;
+    buildDots(total);
+    clampIndex(total);
+    applyTransform();
+  };
+
+  const buildCard = (rev) => {
+    const node = document.createElement('div');
+    node.className = 'review-node';
+
+    const actions = isMine(rev) ? `
+      <div class="review-actions" aria-label="Review actions">
+        <button class="review-crud-btn btn-edit-rev"
+                data-action="edit" data-id="${esc(rev.id)}"
+                aria-label="Edit review by ${esc(rev.name)}">
+          <i class="fas fa-pen" aria-hidden="true"></i> Edit
+        </button>
+        <button class="review-crud-btn btn-delete-rev"
+                data-action="delete" data-id="${esc(rev.id)}"
+                aria-label="Delete review by ${esc(rev.name)}">
+          <i class="fas fa-trash" aria-hidden="true"></i> Delete
+        </button>
+      </div>` : '';
+
+    node.innerHTML = `
+      <span class="review-stars" aria-label="5 stars">★★★★★</span>
+      <p class="review-text">"${esc(rev.text)}"</p>
+      <h5 class="review-author">${esc(rev.name)}</h5>
+      ${rev.role ? `<span class="review-role">${esc(rev.role)}</span>` : ''}
+      <span class="review-date">${esc(rev.date || '')}</span>
+      ${actions}`;
+    return node;
+  };
+
+  const buildDots = (total) => {
+    if (!dotsWrap) return;
+    dotsWrap.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'reviews-dot' + (i === current ? ' active' : '');
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', `Reviews page ${i + 1}`);
+      dot.setAttribute('aria-selected', String(i === current));
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    }
+  };
+
+  const clampIndex = (total) => {
+    if (current >= total) current = Math.max(0, total - 1);
+  };
+
+  const applyTransform = () => {
+    if (track) track.style.transform = `translateX(-${current * 100}%)`;
+    const total = pages();
+    if (curEl) curEl.textContent = Math.min(current + 1, total);
+    (dotsWrap ? dotsWrap.querySelectorAll('.reviews-dot') : []).forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+      d.setAttribute('aria-selected', String(i === current));
+    });
+  };
+
+  const goTo = (i) => {
+    if (isAnim) return;
+    isAnim  = true;
+    current = ((i % pages()) + pages()) % pages();
+    applyTransform();
+    setTimeout(() => { isAnim = false; }, 580);
+  };
+
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  const startAuto = () => { clearInterval(autoTimer); autoTimer = setInterval(next, 7000); };
+  const stopAuto  = () => clearInterval(autoTimer);
+
+  /* ── Drag / swipe ───────────────────────────────────────── */
+  const bindDrag  = () => {
+    if (!container) return;
+    const onDs = x => { dragStart = x; isDragging = true; stopAuto(); };
+    const onDe = x => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (Math.abs(dragStart - x) > 50) { dragStart - x > 0 ? next() : prev(); }
+      startAuto();
+    };
+    container.addEventListener('touchstart', e => onDs(e.changedTouches[0].clientX), { passive: true });
+    container.addEventListener('touchend',   e => onDe(e.changedTouches[0].clientX), { passive: true });
+    container.addEventListener('mousedown',  e => { e.preventDefault(); onDs(e.clientX); });
+    window.addEventListener('mouseup', e => onDe(e.clientX));
+    container.style.cursor = 'grab';
+    container.addEventListener('mousedown', () => { container.style.cursor = 'grabbing'; });
+    window.addEventListener('mouseup', () => { container.style.cursor = 'grab'; });
+  };
+
+  /* ── Delegated edit / delete (by review id) ─────────────── */
+  const onTrackClick = (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'edit')   triggerEdit(id);
+    if (btn.dataset.action === 'delete') triggerDelete(id);
+  };
+
+  const findReview = (id) => reviews.find(r => r.id === id);
+
+  const triggerEdit = (id) => {
+    const r = findReview(id);
+    if (!r || !isMine(r)) return;
+    const ne = document.getElementById('rev-name');
+    const xe = document.getElementById('rev-text');
+    if (ne) ne.value = r.name || '';
+    if (xe) xe.value = r.text || '';
+    if (editIdxInp) editIdxInp.value = r.id;
+    const lbl = submitBtn && (submitBtn.querySelector('.rev-btn-label') || submitBtn.querySelector('span'));
+    if (lbl) lbl.textContent = 'Update Review';
+    if (formTitle)  formTitle.textContent = 'Edit Your Review';
+    clearFb();
+    document.getElementById('review-form-section')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const triggerDelete = (id) => {
+    const r = findReview(id);
+    if (!r || !isMine(r) || !modal) return;
+    modal.removeAttribute('hidden');
+    const ok = document.getElementById('modal-confirm');
+    const no = document.getElementById('modal-cancel');
+    if (!ok || !no) return;
+    const newOk = ok.cloneNode(true);
+    const newNo = no.cloneNode(true);
+    ok.replaceWith(newOk); no.replaceWith(newNo);
+    const close = () => { modal.setAttribute('hidden', ''); document.removeEventListener('keydown', onEsc); };
+    const onEsc = e => { if (e.key === 'Escape') close(); };
+
+    const doDelete = async () => {
+      if (fbReady) {
+        try { await FirebaseReviews.remove(r.id); myIds.delete(r.id); saveMine(); }
+        catch (err) { showFb('Could not remove the review. Please try again.', 'error'); }
+        /* onSnapshot refreshes the list */
+      } else {
+        const i = reviews.findIndex(x => x.id === id);
+        if (i > -1) reviews.splice(i, 1);
+        saveLocal();
+        myIds.delete(id); saveMine();
+        current = 0; render();
+      }
+    };
+
+    newOk.addEventListener('click', () => { close(); doDelete(); resetForm(); });
+    newNo.addEventListener('click', close);
+    modal.addEventListener('click', e => { if (e.target === modal) close(); }, { once: true });
+    document.addEventListener('keydown', onEsc);
+    newNo.focus();
+  };
+
+  /* ── Feedback ───────────────────────────────────────────── */
+  const showFb = (msg, type) => {
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.className = 'form-feedback ' + type;
+    if (type === 'success') setTimeout(clearFb, 5000);
+  };
+  const clearFb = () => {
+    if (!feedback) return;
+    feedback.textContent = '';
+    feedback.className = 'form-feedback';
+  };
+
+  const resetForm = () => {
+    if (form) form.reset();
+    if (editIdxInp) editIdxInp.value = '';
+    const lbl = submitBtn && (submitBtn.querySelector('.rev-btn-label') || submitBtn.querySelector('span'));
+    if (lbl) lbl.textContent = 'Publish Review';
+    if (formTitle) formTitle.textContent = 'Leave an Impression';
+    clearFb();
+  };
+
+  /* ── Form submit ────────────────────────────────────────── */
+  const setLoading = (on) => { if (submitBtn) submitBtn.disabled = on; };
+
+  const initForm = () => {
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('rev-name')?.value || '').trim();
+      const text = (document.getElementById('rev-text')?.value || '').trim();
+      const editingId = editIdxInp ? editIdxInp.value : '';
+
+      if (!name) { showFb('Please enter your name.', 'error'); document.getElementById('rev-name')?.focus(); return; }
+      if (!text) { showFb('Please write a review.',  'error'); document.getElementById('rev-text')?.focus(); return; }
+      if (name.length > 80)   { showFb('Please keep your name under 80 characters.', 'error'); return; }
+      if (text.length > 1500) { showFb('Please keep your review under 1500 characters.', 'error'); return; }
+
+      const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      setLoading(true);
+      try {
+        if (fbReady) {
+          /* ── Shared path (Firestore) ── */
+          if (editingId) {
+            const existing = findReview(editingId);
+            await FirebaseReviews.update(editingId, {
+              name, text, date: (existing && existing.date) || today
+            });
+          } else {
+            const newId = await FirebaseReviews.add({
+              name, text, date: today, createdAt: Date.now()
+            });
+            addMine(newId);
+          }
+          /* onSnapshot refreshes the list */
+        } else {
+          /* ── Local path (fallback) ── */
+          if (editingId) {
+            const i = reviews.findIndex(r => r.id === editingId);
+            if (i > -1) reviews[i] = { ...reviews[i], name, text, date: reviews[i].date || today };
+          } else {
+            const obj = { id: genId(), name, text, date: today, createdAt: Date.now() };
+            reviews.unshift(obj);
+            addMine(obj.id);
+          }
+          saveLocal();
+          current = 0;
+          render();
+        }
+        resetForm();
+        showFb('Your review has been published.', 'success');
+        if (typeof ToastEngine !== 'undefined') {
+          ToastEngine.show('Your review has been published successfully.', 'success', 6000);
+        }
+      } catch (err) {
+        console.warn('[ReviewEngine] submit failed:', err && err.message);
+        showFb('Could not publish your review right now. Please try again.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+  };
+
+  /* ── Resize ─────────────────────────────────────────────── */
+  let resizeTimer;
+  const onResize = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { current = 0; render(); }, 300);
+  };
+
+  const init = () => {
+    loadMine();
+    loadLocal();        /* instant display from local cache / store */
+    render();
+    bindDrag();
+    initForm();
+    prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
+    nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
+    track   && track.addEventListener('click', onTrackClick);
+    window.addEventListener('resize', onResize, { passive: true });
+    startAuto();
+
+    /* If Firebase is configured, upgrade to shared Firestore reviews */
+    if (FirebaseReviews.isConfigured()) {
+      FirebaseReviews.init().then(() => {
+        fbReady = true;
+        FirebaseReviews.subscribe((list, err) => {
+          if (err) {
+            console.warn('[ReviewEngine] Firestore sync error — using local cache.', err && err.message);
+            return; /* keep the local cache already rendered */
+          }
+          reviews = (list || []).map(r => ({
+            id: r.id, name: r.name || '', role: r.role || '',
+            text: r.text || '', date: r.date || '', createdAt: r.createdAt || null
+          }));
+          saveLocal();   /* mirror to localStorage as a cache for instant next load */
+          render();
+        });
+      }).catch((err) => {
+        console.warn('[ReviewEngine] Firebase unavailable — staying on local storage.', err && err.message);
+        /* fbReady stays false → local mode continues to work */
+      });
+    }
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   6. CONTACT ENGINE
+   ============================================================
+   Two-tier delivery:
+     Tier 1 — POST /api/contact  (Node/Express server.js)
+              Works when the site is served via: npm start
+     Tier 2 — FormSubmit.co      (zero-backend fallback)
+              Works when the site is opened as a static file
+              or the Node server is not yet running.
+   Both tiers deliver to soundarfrancis@gmail.com with
+   Reply-To set to the visitor's email.
+   ============================================================ */
+const ContactEngine = (() => {
+
+  /* ── Config ─────────────────────────────────────────────── */
+  const AUTHOR_EMAIL = 'soundarfrancis@gmail.com';
+  const TIMEOUT_MS   = 14000;
+
+  /*
+   * Set BACKEND_URL to the full URL of your Node server when deployed.
+   * Examples:
+   *   'https://your-app.railway.app'
+   *   'https://fiverupeesdreams.com'
+   * Leave as '/api/contact' for local development (npm start).
+   * When the server is unreachable the form falls back to FormSubmit.
+   */
+  const BACKEND_URL = '/api/contact';
+
+  /* ── DOM refs ───────────────────────────────────────────── */
+  const form      = document.getElementById('contact-form');
+  const submitBtn = document.getElementById('contact-submit-btn');
+  const feedback  = document.getElementById('contact-feedback');
+
+  /* ── UI helpers ─────────────────────────────────────────── */
+  const showFb = (msg, type) => {
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.className   = 'form-feedback ' + type;
+    if (type === 'success') setTimeout(clearFb, 9000);
+  };
+
+  const clearFb = () => {
+    if (!feedback) return;
+    feedback.textContent = '';
+    feedback.className   = 'form-feedback';
+  };
+
+  const setLoading = (on) => {
+    if (!submitBtn) return;
+    submitBtn.classList.toggle('loading', on);
+    submitBtn.disabled = on;
+  };
+
+  /* ── Tier 1: Node/Express backend ───────────────────────── */
+  const sendViaBackend = async (name, email, message) => {
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+
+    let res;
+    try {
+      res = await fetch(BACKEND_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, email, message }),
+        signal:  ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    console.log('[ContactEngine] Backend response:', res.status);
+
+    /* 405 = server not running / wrong origin — let fallback handle it */
+    if (res.status === 405 || res.status === 404) {
+      throw Object.assign(new Error('backend_unavailable'), { fallback: true });
+    }
+
+    let data = {};
+    try { data = await res.json(); } catch (_) {}
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || `Server error ${res.status}`);
+    }
+
+    return data;
+  };
+
+  /* ── Tier 2: FormSubmit.co (no backend needed) ──────────── */
+  const sendViaFormSubmit = async (name, email, message) => {
+    console.log('[ContactEngine] Using FormSubmit fallback...');
+
+    const payload = new FormData();
+    payload.append('name',     name);
+    payload.append('email',    email);
+    payload.append('message',  message);
+    payload.append('_replyto', email);
+    payload.append('_subject', `New message from ${name} — Five Rupees Dreams`);
+    payload.append('_captcha', 'false');
+    payload.append('_template', 'box');
+
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+
+    let res;
+    try {
+      res = await fetch(`https://formsubmit.co/ajax/${AUTHOR_EMAIL}`, {
+        method:  'POST',
+        headers: { 'Accept': 'application/json' },
+        body:    payload,
+        signal:  ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    console.log('[ContactEngine] FormSubmit response:', res.status);
+
+    let data = {};
+    try { data = await res.json(); } catch (_) {}
+
+    if (!res.ok || data.success === false) {
+      throw new Error('FormSubmit delivery failed');
+    }
+  };
+
+  /* ── Form submit handler ────────────────────────────────── */
+  const init = () => {
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearFb();
+
+      const name    = (document.getElementById('contact-name')?.value    || '').trim();
+      const email   = (document.getElementById('contact-email')?.value   || '').trim();
+      const message = (document.getElementById('contact-message')?.value || '').trim();
+
+      /* Client-side validation */
+      if (!name) {
+        showFb('Please enter your name.', 'error');
+        document.getElementById('contact-name')?.focus();
+        return;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showFb('Please enter a valid email address.', 'error');
+        document.getElementById('contact-email')?.focus();
+        return;
+      }
+      if (!message) {
+        showFb('Please write a message.', 'error');
+        document.getElementById('contact-message')?.focus();
+        return;
+      }
+      if (message.length < 10) {
+        showFb('Message must be at least 10 characters.', 'error');
+        document.getElementById('contact-message')?.focus();
+        return;
+      }
+
+      setLoading(true);
+      console.log('[ContactEngine] Sending... | Recipient:', AUTHOR_EMAIL);
+
+      try {
+        /* ── Try backend first ────────────────────────────── */
+        try {
+          await sendViaBackend(name, email, message);
+          console.log('[ContactEngine] Success — delivered via backend.');
+        } catch (backendErr) {
+          /* Only fall back if backend is unreachable/405 */
+          if (!backendErr.fallback) throw backendErr;
+
+          console.log('[ContactEngine] Backend not available — trying FormSubmit...');
+          await sendViaFormSubmit(name, email, message);
+          console.log('[ContactEngine] Success — delivered via FormSubmit.');
+        }
+
+        form.reset();
+        showFb('Your message has been sent to Francis. He will be in touch soon.', 'success');
+        ToastEngine.show('Your message has been sent to Francis. He will be in touch soon.', 'success', 8000);
+
+      } catch (err) {
+        const isAbort   = err.name === 'AbortError';
+        const isNetwork = err.message === 'Failed to fetch';
+
+        console.error('[ContactEngine] Failure:', err.message);
+
+        if (isAbort) {
+          showFb('Request timed out. Please check your connection and try again.', 'error');
+        } else if (isNetwork) {
+          showFb('Network error. Please email directly: ' + AUTHOR_EMAIL, 'error');
+        } else {
+          showFb(err.message || 'Message could not be sent. Please email: ' + AUTHOR_EMAIL, 'error');
+        }
+      } finally {
+        setLoading(false);
+      }
+    });
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   7. UTIL ENGINE — scroll reveals, back-to-top, footer year
+   ============================================================ */
+const UtilEngine = (() => {
+
+  const initReveals = () => {
+    const els = document.querySelectorAll('[data-reveal]');
+    if (!els.length) return;
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('revealed');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+
+    els.forEach(el => obs.observe(el));
+  };
+
+  /* Stagger child grids when their parent section is revealed */
+  const initStaggerGrids = () => {
+    const grids = document.querySelectorAll(
+      '.endorsements-grid, .media-grid, .speaking-topics-grid, .author-highlights, .contact-cards-grid'
+    );
+    if (!grids.length) return;
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('stagger-revealed');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+
+    grids.forEach(g => obs.observe(g));
+  };
+
+  const initFooterYear = () => {
+    const el = document.getElementById('footer-year');
+    if (el) el.textContent = new Date().getFullYear();
+  };
+
+  /* Keyboard-accessible modal close */
+  const initModalA11y = () => {
+    document.addEventListener('keydown', e => {
+      const modal = document.getElementById('delete-modal');
+      if (modal && !modal.hasAttribute('hidden') && e.key === 'Escape') {
+        modal.setAttribute('hidden', '');
+      }
+    });
+  };
+
+  const init = () => {
+    initReveals();
+    initStaggerGrids();
+    initFooterYear();
+    initModalA11y();
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   TOAST ENGINE — premium branded notifications
+   ============================================================ */
+const ToastEngine = (() => {
+  const container = document.getElementById('toast-container');
+
+  const ICONS = {
+    success: '<i class="fas fa-check" aria-hidden="true"></i>',
+    error:   '<i class="fas fa-exclamation" aria-hidden="true"></i>',
+    info:    '<i class="fas fa-info" aria-hidden="true"></i>',
+  };
+
+  const TITLES = {
+    success: 'Success',
+    error:   'Attention',
+    info:    'Notice',
+  };
+
+  const show = (message, type = 'info', duration = 6000) => {
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+      <div class="toast-icon">${ICONS[type] || ICONS.info}</div>
+      <div class="toast-body">
+        <span class="toast-title">${TITLES[type] || 'Notice'}</span>
+        <span class="toast-msg">${message}</span>
+      </div>
+      <button class="toast-close" aria-label="Dismiss notification">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>`;
+
+    container.appendChild(toast);
+
+    /* Trigger show animation */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => toast.classList.add('toast-show'));
+    });
+
+    const dismiss = () => {
+      toast.classList.remove('toast-show');
+      toast.classList.add('toast-hide');
+      setTimeout(() => toast.remove(), 500);
+    };
+
+    toast.querySelector('.toast-close').addEventListener('click', dismiss);
+
+    if (duration > 0) setTimeout(dismiss, duration);
+  };
+
+  return { show };
+})();
+
+/* ============================================================
+   8. MOBILE CAROUSEL ENGINE
+   ============================================================
+   Shared factory that powers both the Endorsements carousel
+   and the Media carousel on screens < 768px.
+   On desktop (≥ 768px) the engine is dormant — the sections
+   remain static CSS grids.
+   Supports: touch swipe, mouse drag, dot navigation.
+   ============================================================ */
+const MobileCarouselEngine = (() => {
+
+  const MOBILE_BP = 768; /* breakpoint in px */
+
+  /**
+   * buildCarousel(config)
+   * @param {object} config
+   *   trackId   — id of the flex/grid track element
+   *   dotsId    — id of the dots container
+   *   outerEl   — the overflow:hidden outer wrapper element
+   *   itemSel   — CSS selector for individual slide items inside the track
+   */
+  const buildCarousel = ({ trackId, dotsId, outerEl, itemSel }) => {
+
+    const track   = document.getElementById(trackId);
+    const dotsWrap = document.getElementById(dotsId);
+    if (!track || !dotsWrap || !outerEl) return;
+
+    let current    = 0;
+    let isAnimating = false;
+    let dragStart  = 0;
+    let isDragging = false;
+
+    /* ── Collect slides ── */
+    const getSlides = () => Array.from(track.querySelectorAll(itemSel));
+
+    /* ── Build dots ── */
+    const buildDots = (slides) => {
+      dotsWrap.innerHTML = '';
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'm-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Slide ${i + 1}`);
+        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        dot.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(dot);
+      });
+    };
+
+    /* ── Update dot state ── */
+    const updateDots = (slides) => {
+      const dots = dotsWrap.querySelectorAll('.m-dot');
+      dots.forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+        d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+      });
+      /* aria-live region: announce current slide */
+      track.setAttribute('aria-label', `Slide ${current + 1} of ${slides.length}`);
+    };
+
+    /* ── Apply translateX ── */
+    const applyTransform = () => {
+      track.style.transform = `translateX(-${current * 100}%)`;
+    };
+
+    /* ── Navigate ── */
+    const goTo = (index) => {
+      const slides = getSlides();
+      if (isAnimating || index === current) return;
+      isAnimating = true;
+      current = (index + slides.length) % slides.length;
+      applyTransform();
+      updateDots(slides);
+      setTimeout(() => { isAnimating = false; }, 470);
+    };
+
+    const next = () => { const s = getSlides(); goTo((current + 1) % s.length); };
+    const prev = () => { const s = getSlides(); goTo((current - 1 + s.length) % s.length); };
+
+    /* ── Drag / touch ── */
+    const onDragStart = (x) => { dragStart = x; isDragging = true; };
+    const onDragEnd   = (x) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const delta = dragStart - x;
+      if (Math.abs(delta) > 50) { delta > 0 ? next() : prev(); }
+    };
+
+    const bindDrag = () => {
+      outerEl.addEventListener('touchstart', e => onDragStart(e.changedTouches[0].clientX), { passive: true });
+      outerEl.addEventListener('touchend',   e => onDragEnd(e.changedTouches[0].clientX),   { passive: true });
+      outerEl.addEventListener('mousedown',  e => { e.preventDefault(); onDragStart(e.clientX); });
+      window.addEventListener ('mouseup',   e => onDragEnd(e.clientX));
+      outerEl.style.cursor = 'grab';
+      outerEl.addEventListener('mousedown', () => { outerEl.style.cursor = 'grabbing'; });
+      window.addEventListener ('mouseup',  () => { outerEl.style.cursor = 'grab'; });
+    };
+
+    /* ── Activate (mobile) ── */
+    const activate = () => {
+      const slides = getSlides();
+      if (!slides.length) return;
+      current = 0;
+      buildDots(slides);
+      updateDots(slides);
+      applyTransform();
+      bindDrag();
+      dotsWrap.setAttribute('aria-hidden', 'false');
+    };
+
+    /* ── Deactivate (desktop) ── */
+    const deactivate = () => {
+      track.style.transform = '';
+      dotsWrap.innerHTML    = '';
+      dotsWrap.setAttribute('aria-hidden', 'true');
+      outerEl.style.cursor  = '';
+      current = 0;
+    };
+
+    return { activate, deactivate };
+  };
+
+  /* ── Media-query driven init / teardown ── */
+  const init = () => {
+
+    const endorsementsOuter = document.getElementById('endorsements-carousel-outer');
+    const mediaOuter        = document.getElementById('media-carousel-outer');
+
+    if (!endorsementsOuter && !mediaOuter) return;
+
+    const endorsementsCtrl = endorsementsOuter ? buildCarousel({
+      trackId:  'endorsements-track',
+      dotsId:   'endorsements-dots',
+      outerEl:  endorsementsOuter,
+      itemSel:  '.endorsement-card',
+    }) : null;
+
+    const mediaCtrl = mediaOuter ? buildCarousel({
+      trackId:  'media-track',
+      dotsId:   'media-dots',
+      outerEl:  mediaOuter,
+      itemSel:  '.media-card',
+    }) : null;
+
+    let mobileActive = false;
+
+    const toggle = () => {
+      const isMobile = window.innerWidth < MOBILE_BP;
+      if (isMobile && !mobileActive) {
+        endorsementsCtrl && endorsementsCtrl.activate();
+        mediaCtrl        && mediaCtrl.activate();
+        mobileActive = true;
+      } else if (!isMobile && mobileActive) {
+        endorsementsCtrl && endorsementsCtrl.deactivate();
+        mediaCtrl        && mediaCtrl.deactivate();
+        mobileActive = false;
+      }
+    };
+
+    /* Run once immediately, then on resize */
+    toggle();
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(toggle, 200);
+    }, { passive: true });
+  };
+
+  return { init };
+})();
+
+/* ============================================================
+   BOOTSTRAP ALL MODULES
+   ============================================================ */
+NavEngine.init();
+GalleryEngine.init();
+QuotesEngine.init();
+ReviewEngine.init();
+ContactEngine.init();
+UtilEngine.init();
+MobileCarouselEngine.init();
+
+}); /* end DOMContentLoaded */
