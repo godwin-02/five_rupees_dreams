@@ -528,6 +528,21 @@ div[id="buy-book"] {
   overflow: visible;
 }
 
+/* Publisher logo — enlarged for better visibility */
+.publisher-logo {
+  width: clamp(160px, 22vw, 260px);
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .publisher-logo {
+    width: clamp(120px, 50vw, 180px);
+  }
+}
+
 /* ==========================================================================
    PORTRAIT FRAME
    ========================================================================== */
@@ -853,9 +868,20 @@ div[id="buy-book"] {
 .quote-text {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+  font-size: clamp(1.3rem, 2.6vw, 1.65rem);
   line-height: 1.7;
   color: var(--text-primary);
+}
+
+/* Colour variation for individual quote slides */
+.quote-slide:nth-child(1) .quote-text { color: #7B4F1E; }  /* warm amber-brown */
+.quote-slide:nth-child(2) .quote-text { color: #1A5276; }  /* deep ocean blue */
+.quote-slide:nth-child(3) .quote-text { color: #145A32; }  /* forest green    */
+.quote-slide:nth-child(4) .quote-text { color: #6E2C9A; }  /* contemplative purple */
+.quote-slide:nth-child(5) .quote-text { color: #B7410E; }  /* russet-terracotta */
+
+@media (max-width: 768px) {
+  .quote-text { font-size: clamp(1.05rem, 4vw, 1.3rem); }
 }
 
 .quote-nav {
@@ -1028,6 +1054,23 @@ div[id="buy-book"] {
 /* Counter */
 .gallery-counter { display: none; }
 
+/* YouTube video as last gallery carousel slide — matches image frame */
+.gallery-video-slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.gallery-video-slide iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
 /* ==========================================================================
    REVIEWS SECTION
    ========================================================================== */
@@ -1036,7 +1079,7 @@ div[id="buy-book"] {
 .reviews-carousel-wrapper {
   position: relative;
   width: 100%;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 0;
 }
 
 .reviews-track-container {
@@ -1075,7 +1118,7 @@ div[id="buy-book"] {
   background: var(--card);
   border: 1px solid var(--gold-divider);
   border-radius: 12px;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1088,11 +1131,6 @@ div[id="buy-book"] {
     border-color: rgba(212,175,55,0.4);
     box-shadow: 0 14px 40px var(--gold-glow);
     transform: translateY(-3px);
-  }
-
-  .review-node:hover .review-actions {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -1111,7 +1149,7 @@ div[id="buy-book"] {
   color: var(--gold-mid);
   font-size: 0.9rem;
   letter-spacing: 0.1em;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.6rem;
   display: block;
 }
 
@@ -1119,9 +1157,9 @@ div[id="buy-book"] {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: clamp(0.95rem, 1.8vw, 1.1rem);
-  line-height: 1.7;
+  line-height: 1.6;
   color: var(--text-primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   flex: 1;
 }
 
@@ -1147,45 +1185,44 @@ div[id="buy-book"] {
   letter-spacing: 0.04em;
 }
 
-/* CRUD actions */
-.review-actions {
+/* Review title (for seed reviews) */
+.review-title {
+  font-family: var(--font-serif);
+  font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.65rem;
+  font-style: normal;
+}
+
+/* Bilingual review layout */
+.review-bilingual {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--gold-divider);
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.3s, transform 0.3s;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
 }
 
-/* Always show actions on touch devices */
-@media (hover: none) {
-  .review-actions {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.review-lang-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.review-crud-btn {
-  background: none;
-  border: none;
-  font-size: 0.7rem;
+.review-lang-label {
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0;
-  transition: color 0.25s;
+  letter-spacing: 0.14em;
+  color: var(--gold-hi);
+  display: block;
 }
 
-.btn-edit-rev  { color: #4A90E2; }
-.btn-edit-rev:hover  { color: #2171cc; }
-.btn-delete-rev { color: #D0021B; }
-.btn-delete-rev:hover { color: #a80115; }
+/* When bilingual, remove the bottom margin on review-text since .review-bilingual handles it */
+.review-bilingual .review-text {
+  margin-bottom: 0;
+  flex: unset;
+}
 
 /* Reviews navigation bar */
 .reviews-nav {
@@ -1249,11 +1286,7 @@ div[id="buy-book"] {
   transform: scale(1.35);
 }
 
-/* Review form */
-.review-form-wrapper {
-  max-width: 820px;
-  margin: 0 auto;
-}
+/* Review form — removed (Leave an Impression section deleted) */
 
 .form-row {
   display: grid;
@@ -1740,7 +1773,6 @@ div[id="buy-book"] {
   .book-grid    { grid-template-columns: 1fr; gap: 1.25rem; }
   .purchase-box { padding: 1rem; }
   .quotes-carousel { min-height: 130px; }
-  .quote-text   { font-size: clamp(1rem, 3.5vw, 1.15rem); }
 
   /* Gallery */
   .gallery-viewport { border-radius: 10px; }
@@ -1755,10 +1787,8 @@ div[id="buy-book"] {
   .review-card     { grid-template-columns: 1fr; }
   .reviews-nav     { gap: 0.75rem; }
   .reviews-counter { min-width: 100px; font-size: 0.72rem; }
-  .review-node     { padding: 1.5rem 1.25rem; }
-  .review-form-wrapper { padding: 1.5rem 1.25rem; }
+  .review-node     { padding: 1.25rem 1.25rem; }
   .form-row        { grid-template-columns: 1fr; gap: 0; }
-  #review-form .btn { width: 100%; justify-content: center; }
 
   /* Publisher */
   .publisher-split  { grid-template-columns: 1fr; gap: 1.75rem; }
@@ -1962,17 +1992,7 @@ div[id="buy-book"] {
    AUTHOR SECTION ENHANCEMENTS
    ========================================================================== */
 
-/* Publisher logo */
-.publisher-logo {
-  display: block;
-  max-width: 280px;
-  max-height: 130px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  margin-bottom: 1.25rem;
-  border-radius: 6px;
-}
+/* Publisher logo — see main publisher-logo rule above */
 
 /* Role tags */
 .author-roles {
@@ -2785,9 +2805,9 @@ div[id="buy-book"] {
 }
 
 .excerpts-card .quote-text {
-  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  font-size: clamp(1.3rem, 2.6vw, 1.65rem);
   line-height: 1.75;
-  color: var(--text-primary);
+  /* colour comes from nth-child rules on .quote-slide */
 }
 
 /* Dot nav — centred */
@@ -2812,7 +2832,7 @@ div[id="buy-book"] {
   }
 
   .excerpts-card .quote-text {
-    font-size: clamp(1rem, 4vw, 1.2rem);
+    font-size: clamp(1.05rem, 4vw, 1.3rem);
     line-height: 1.65;
   }
 }
@@ -3200,11 +3220,7 @@ div[id="buy-book"] {
     grid-template-columns: 1fr;
   }
 
-  /* Publisher logo: scale down gracefully */
-  .publisher-logo {
-    max-width: 200px;
-    max-height: 90px;
-  }
+  /* Publisher logo: scale down gracefully — handled by clamp in main rule */
 
   /* Contact form: full-width inputs */
   .form-field input,
@@ -3240,11 +3256,7 @@ div[id="buy-book"] {
     justify-content: center;
   }
 
-  /* Publisher logo */
-  .publisher-logo {
-    max-width: 160px;
-    max-height: 72px;
-  }
+  /* Publisher logo — handled by clamp in main rule */
 
   /* Speaking CTA */
   .speaking-cta-box {
@@ -4107,7 +4119,7 @@ img {
   background: #ffffff;
   border: 1px solid rgba(212,175,55,0.18);
   border-radius: 12px;
-  padding: clamp(1.5rem, 3vw, 2.25rem);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -4146,7 +4158,7 @@ img {
   color: var(--gold-hi);
   font-size: 0.88rem;
   letter-spacing: 0.08em;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.6rem;
   display: block;
 }
 
@@ -4154,9 +4166,9 @@ img {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: clamp(0.94rem, 1.8vw, 1.08rem);
-  line-height: 1.72;
+  line-height: 1.6;
   color: var(--text-primary);
-  margin-bottom: 1.4rem;
+  margin-bottom: 1rem;
   flex: 1;
 }
 

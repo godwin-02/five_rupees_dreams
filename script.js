@@ -229,6 +229,13 @@ const GalleryEngine = (() => {
       title: 'Beloved Grandmother',
       caption: 'Wisdom, sacrifice, and unconditional love across generations.',
       desc: 'A portrait honouring the quiet strength of a grandmother whose love laid the foundation for everything that followed.'
+    },
+    // 19. YouTube Shorts video — final gallery item
+    {
+      video: 'https://www.youtube.com/embed/zQgge5NFaI8',
+      title: 'Featured Video',
+      caption: 'The Five Rupees Dreams — a short video journey.',
+      desc: 'A YouTube Shorts feature capturing the spirit of The Five Rupees Dreams.'
     }
   ];
 
@@ -257,19 +264,38 @@ const GalleryEngine = (() => {
       slide.setAttribute('aria-roledescription', 'slide');
       slide.setAttribute('aria-label', `Photo ${i + 1} of ${total}: ${item.title}`);
 
-      const img = document.createElement('img');
-      img.src     = item.src;
-      img.alt     = item.caption;
-      img.loading = i === 0 ? 'eager' : 'lazy';
-      img.decoding = 'async';
-      if (item.fallback) img.onerror = () => { img.src = item.fallback; };
+      if (item.video) {
+        /* YouTube embed as the last gallery item — same frame as images */
+        const wrap = document.createElement('div');
+        wrap.className = 'gallery-video-slide';
+
+        const iframe = document.createElement('iframe');
+        iframe.src = item.video;
+        iframe.title = item.title;
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.loading = 'lazy';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+
+        wrap.appendChild(iframe);
+        slide.appendChild(wrap);
+      } else {
+        const img = document.createElement('img');
+        img.src     = item.src;
+        img.alt     = item.caption;
+        img.loading = i === 0 ? 'eager' : 'lazy';
+        img.decoding = 'async';
+        if (item.fallback) img.onerror = () => { img.src = item.fallback; };
+
+        slide.appendChild(img);
+      }
 
       const cap = document.createElement('div');
       cap.className = 'gallery-caption';
       cap.setAttribute('aria-hidden', 'true');
       cap.innerHTML = `<h5>${item.title}</h5><p>${item.caption} — ${item.desc}</p>`;
 
-      slide.appendChild(img);
       slide.appendChild(cap);
       track.appendChild(slide);
     });
@@ -570,11 +596,77 @@ const FirebaseReviews = (() => {
    Each review carries a stable `id`. Edit/Delete are only offered
    on reviews created in THIS browser (tracked in frd-reviews-mine)
    so visitors cannot modify other people's shared reviews.
+
+   SEED REVIEWS: Five canonical reviews supplied by the site owner
+   are always shown first and cannot be edited or deleted.
    ============================================================ */
 const ReviewEngine = (() => {
 
   const STORAGE_KEY = 'frd-reviews-v6';   /* local store / Firestore cache */
   const MINE_KEY    = 'frd-reviews-mine'; /* ids created in this browser */
+
+  /* ── Canonical seed reviews (site-owner supplied) ──────── */
+  const SEED_REVIEWS = [
+    {
+      id: '__seed_martha',
+      seed: true,
+      name: 'Martha L. Rogers, PhD',
+      role: 'Forensic Neuropsychologist & Confirmation Teacher',
+      stars: 5,
+      title: 'The poetry of life...',
+      meta: 'Reviewed in the United States · October 21, 2026 · Kindle',
+      text: 'Fr. Francis is living in the US after completing his residency and credentialing in chaplaincy. And I expected more of a narrative account of his life in living in India and then coming here. But it was a surprise: the layout of his book is very different: it compels you to slow down and absorb his story as it unfolds in layers and stages. He came from a world where simply surviving from day-to-day was tenuous. Learning to share bonds and to deepen them during times he had to take leaps of faith led to maturing and becoming more of the person who was fulfilling his destiny. He is still a young man so I hope he will add a second and third edition of his story as time goes on. I really like how he turns to his reader periodically, gently asking how are you processing these hurdles of life for yourself? It is definitely not a \'preachy\' book as he reaches out to adolescents or young adults — no canned answers here! I live in two worlds, one as a forensic neuropsychologist where I evaluate young people for the court, and another where I teach Confirmation classes at my church — in both places these are youths facing serious dilemmas in their lives. I think, Fr. Francis\'s book will be one that I can share because it is very readable in how he shares his amazing walk through life! I appreciate the cross-cultural and faith that is quite relatable!',
+      lang: 'en'
+    },
+    {
+      id: '__seed_uta',
+      seed: true,
+      name: 'Uta',
+      role: '',
+      stars: 5,
+      title: 'Wunderschöne Lebensreise mit einer tiefen Botschaft! · A Beautiful Life Journey with a Profound Message!',
+      meta: 'Reviewed in Germany · 13 October 2026 · Kindle Edition · Verified Purchase',
+      textDe: '„Fünf Rupien Träume" ist weit mehr als eine Biografie über das Überwinden von Armut. Francis nimmt uns mit auf eine sehr persönliche Reise der Selbstfindung. Besonders beeindruckt hat mich, wie er durch Nächstenliebe und das Dienen am Menschen seine innere Ruhe gefunden hat. Das Buch regt intensiv zur Selbstreflexion an und schenkt dem Leser unglaublich viel Kraft und Hoffnung. Ein wunderbares E-Book, das lange nachwirkt und zeigt, wo echtes Glück wirklich liegt.',
+      text: '"Five Rupee Dreams" is much more than a biography about overcoming poverty. Francis takes us on a deeply personal journey of self-discovery. I was particularly impressed by how he found inner peace through loving others and serving people. The book inspires deep self-reflection and gives readers an incredible amount of strength and hope. A wonderful e-book that leaves a lasting impression and shows where true happiness really lies.',
+      lang: 'de'
+    },
+    {
+      id: '__seed_marco',
+      seed: true,
+      name: 'Marco',
+      role: '',
+      stars: 5,
+      title: 'Eine Hymne an die menschliche Resilienz! · A Tribute to Human Resilience!',
+      meta: 'Reviewed in Germany · 13 October 2026 · Kindle Edition',
+      textDe: 'Dieses Buch hat mich tief im Herzen berührt. Nach meiner eigenen Erfahrung von zwei Jahren Lebenszeit in Indien konnte ich die Atmosphäre und die beschriebenen Orte noch intensiver nachempfinden. Der Autor beschreibt ungeschönt und ehrlich die harte Realität seiner Kindheit in Tamil Nadu, verliert dabei aber nie den Blick für das Schöne und Hoffnungsvolle. Seine Verwandlung und sein Weg in den Dienst an den Mitmenschen sind absolut inspirierend. Ein echtes Mutmachbuch für jeden, der gerade selbst vor großen Hürden steht!',
+      text: 'This book touched me deeply. Having spent two years in India myself, I could relate even more strongly to the atmosphere and the places described. The author portrays the harsh reality of his childhood in Tamil Nadu honestly and without sugar-coating it, yet never loses sight of the beauty and hope in life. His transformation and his journey toward serving others are truly inspiring. This is an uplifting book for anyone currently facing major challenges of their own!',
+      lang: 'de'
+    },
+    {
+      id: '__seed_juergen',
+      seed: true,
+      name: 'Juergen',
+      role: '',
+      stars: 5,
+      title: 'A Journey Beyond Material Wealth',
+      meta: '',
+      textDe: 'Wer hier eine klassische „Vom Tellerwäscher zum Millionär"-Biografie erwartet, wird positiv überrascht sein. Francis beschreibt in „Fünf Rupien Träume" auf unglaublich berührende Weise seinen Weg aus der Armut in Indien. Doch statt um materiellen Reichtum geht es in diesem Buch um etwas viel Wertvolleres: die Suche nach dem Sinn des Lebens und das Finden von innerem Frieden. Es ist faszinierend zu lesen, wie der Autor seine Erfüllung und tiefste Ruhe im Dienen am Mitmenschen und in der Seelsorge gefunden hat. Ein zutiefst inspirierendes Werk, das den Blick auf das Wesentliche im Leben lenkt. Absolute Kaufempfehlung für das Kindle! 5 von 5 Sternen!',
+      text: 'Anyone expecting a conventional "rags-to-riches" biography will be pleasantly surprised. In "Five Rupee Dreams," Francis describes his journey out of poverty in India in an incredibly moving way. Yet this book is not about material wealth, but something far more valuable: the search for life\'s meaning and the discovery of inner peace. It is fascinating to read how the author found fulfilment and profound tranquillity through serving others and working in pastoral care. A deeply inspiring work that directs our attention to what truly matters in life. Highly recommended for Kindle! Five out of five stars!',
+      lang: 'de'
+    },
+    {
+      id: '__seed_pascal',
+      seed: true,
+      name: 'Pascal',
+      role: '',
+      stars: 5,
+      title: 'A Truly Inspiring Life Story',
+      meta: '',
+      textDe: 'Dieses Buch hat mich tief bewegt. Die Lebensgeschichte von Francis Soundararajan zeigt eindrucksvoll, dass neue Möglichkeiten nicht immer in Geld oder Erfolg gemessen werden müssen. Seine Reise von einfachen Verhältnissen hin zu einem Leben, das ganz dem Dienst an anderen Menschen gewidmet ist, schenkt beim Lesen eine ganz besondere Ruhe. Seine Authentizität und die spirituellen Einsichten sind eine wahre Inspiration für den eigenen Alltag. Ein echtes Juwel auf meinem Kindle, das ich jedem nur ans Herz legen kann, vor allem wenn man sein Leben gerade überdenken möchte!',
+      text: 'This book deeply moved me. The life story of Francis Soundararajan powerfully shows that new possibilities cannot always be measured in money or success. His journey from humble beginnings to a life devoted entirely to serving others brings a special sense of peace to the reading experience. His authenticity and spiritual insights are a genuine inspiration for everyday life. A true gem on my Kindle that I wholeheartedly recommend to everyone, especially those who are reconsidering their lives.',
+      lang: 'de'
+    }
+  ];
 
   /* ── DOM refs ───────────────────────────────────────────── */
   const track      = document.getElementById('reviews-track');
@@ -583,12 +675,6 @@ const ReviewEngine = (() => {
   const dotsWrap   = document.getElementById('reviews-dots');
   const curEl      = document.getElementById('rev-current');
   const totEl      = document.getElementById('rev-total');
-  const form       = document.getElementById('review-form');
-  const editIdxInp = document.getElementById('rev-edit-index');
-  const submitBtn  = document.getElementById('rev-submit-btn');
-  const formTitle  = document.getElementById('review-form-title');
-  const feedback   = document.getElementById('review-feedback');
-  const modal      = document.getElementById('delete-modal');
   const container  = document.querySelector('.reviews-track-container');
 
   /* ── State ──────────────────────────────────────────────── */
@@ -605,15 +691,23 @@ const ReviewEngine = (() => {
   const loadLocal = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      reviews = raw ? JSON.parse(raw) : [];
-      if (!Array.isArray(reviews)) reviews = [];
+      let stored = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(stored)) stored = [];
+      /* Remove any old seed reviews that may have been cached */
+      stored = stored.filter(r => !r.seed);
       /* Ensure every cached/local review has a stable id */
-      reviews.forEach(r => { if (!r.id) r.id = genId(); });
-    } catch (_) { reviews = []; }
+      stored.forEach(r => { if (!r.id) r.id = genId(); });
+      /* Always prepend the canonical seed reviews */
+      reviews = [...SEED_REVIEWS, ...stored];
+    } catch (_) { reviews = [...SEED_REVIEWS]; }
   };
 
   const saveLocal = () => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews)); } catch (_) {}
+    try {
+      /* Only persist user-submitted reviews, never seeds */
+      const userReviews = reviews.filter(r => !r.seed);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userReviews));
+    } catch (_) {}
   };
 
   const loadMine = () => {
@@ -640,6 +734,8 @@ const ReviewEngine = (() => {
   /* ── Is a review editable from this browser? ──────────── */
   const isMine = (rev) => {
     if (!rev || !rev.id) return false;
+    /* Seed reviews are never editable or deletable */
+    if (rev.seed) return false;
     /* In local mode every review originated here → editable (preserves old UX) */
     if (!fbReady) return true;
     return myIds.has(rev.id);
@@ -708,27 +804,36 @@ const ReviewEngine = (() => {
     const node = document.createElement('div');
     node.className = 'review-node';
 
-    const actions = isMine(rev) ? `
-      <div class="review-actions" aria-label="Review actions">
-        <button class="review-crud-btn btn-edit-rev"
-                data-action="edit" data-id="${esc(rev.id)}"
-                aria-label="Edit review by ${esc(rev.name)}">
-          <i class="fas fa-pen" aria-hidden="true"></i> Edit
-        </button>
-        <button class="review-crud-btn btn-delete-rev"
-                data-action="delete" data-id="${esc(rev.id)}"
-                aria-label="Delete review by ${esc(rev.name)}">
-          <i class="fas fa-trash" aria-hidden="true"></i> Delete
-        </button>
-      </div>` : '';
+    /* Bilingual review block (for German reviews with translations) */
+    const bilingualBlock = (rev.textDe && rev.lang === 'de') ? `
+      <div class="review-bilingual">
+        <div class="review-lang-block">
+          <span class="review-lang-label" aria-label="Original German text">🇩🇪 Original (Deutsch)</span>
+          <p class="review-text review-text-de" lang="de">${esc(rev.textDe)}</p>
+        </div>
+        <div class="review-lang-block">
+          <span class="review-lang-label" aria-label="English translation">🇬🇧 Translation (English)</span>
+          <p class="review-text">${esc(rev.text)}</p>
+        </div>
+      </div>` : `<p class="review-text">"${esc(rev.text)}"</p>`;
+
+    /* Stars */
+    const starCount = rev.stars || 5;
+    const starsHtml = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+
+    /* Title (only for seed reviews that have one) */
+    const titleHtml = rev.title ? `<h6 class="review-title">${esc(rev.title)}</h6>` : '';
+
+    /* Metadata (only if provided) */
+    const metaHtml = rev.meta ? `<span class="review-date">${esc(rev.meta)}</span>` : '';
 
     node.innerHTML = `
-      <span class="review-stars" aria-label="5 stars">★★★★★</span>
-      <p class="review-text">"${esc(rev.text)}"</p>
+      <span class="review-stars" aria-label="${starCount} out of 5 stars">${starsHtml}</span>
+      ${titleHtml}
+      ${bilingualBlock}
       <h5 class="review-author">${esc(rev.name)}</h5>
       ${rev.role ? `<span class="review-role">${esc(rev.role)}</span>` : ''}
-      <span class="review-date">${esc(rev.date || '')}</span>
-      ${actions}`;
+      ${metaHtml}`;
     return node;
   };
 
@@ -793,150 +898,6 @@ const ReviewEngine = (() => {
     window.addEventListener('mouseup', () => { container.style.cursor = 'grab'; });
   };
 
-  /* ── Delegated edit / delete (by review id) ─────────────── */
-  const onTrackClick = (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const id = btn.dataset.id;
-    if (btn.dataset.action === 'edit')   triggerEdit(id);
-    if (btn.dataset.action === 'delete') triggerDelete(id);
-  };
-
-  const findReview = (id) => reviews.find(r => r.id === id);
-
-  const triggerEdit = (id) => {
-    const r = findReview(id);
-    if (!r || !isMine(r)) return;
-    const ne = document.getElementById('rev-name');
-    const xe = document.getElementById('rev-text');
-    if (ne) ne.value = r.name || '';
-    if (xe) xe.value = r.text || '';
-    if (editIdxInp) editIdxInp.value = r.id;
-    const lbl = submitBtn && (submitBtn.querySelector('.rev-btn-label') || submitBtn.querySelector('span'));
-    if (lbl) lbl.textContent = 'Update Review';
-    if (formTitle)  formTitle.textContent = 'Edit Your Review';
-    clearFb();
-    document.getElementById('review-form-section')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const triggerDelete = (id) => {
-    const r = findReview(id);
-    if (!r || !isMine(r) || !modal) return;
-    modal.removeAttribute('hidden');
-    const ok = document.getElementById('modal-confirm');
-    const no = document.getElementById('modal-cancel');
-    if (!ok || !no) return;
-    const newOk = ok.cloneNode(true);
-    const newNo = no.cloneNode(true);
-    ok.replaceWith(newOk); no.replaceWith(newNo);
-    const close = () => { modal.setAttribute('hidden', ''); document.removeEventListener('keydown', onEsc); };
-    const onEsc = e => { if (e.key === 'Escape') close(); };
-
-    const doDelete = async () => {
-      if (fbReady) {
-        try { await FirebaseReviews.remove(r.id); myIds.delete(r.id); saveMine(); }
-        catch (err) { showFb('Could not remove the review. Please try again.', 'error'); }
-        /* onSnapshot refreshes the list */
-      } else {
-        const i = reviews.findIndex(x => x.id === id);
-        if (i > -1) reviews.splice(i, 1);
-        saveLocal();
-        myIds.delete(id); saveMine();
-        current = 0; render();
-      }
-    };
-
-    newOk.addEventListener('click', () => { close(); doDelete(); resetForm(); });
-    newNo.addEventListener('click', close);
-    modal.addEventListener('click', e => { if (e.target === modal) close(); }, { once: true });
-    document.addEventListener('keydown', onEsc);
-    newNo.focus();
-  };
-
-  /* ── Feedback ───────────────────────────────────────────── */
-  const showFb = (msg, type) => {
-    if (!feedback) return;
-    feedback.textContent = msg;
-    feedback.className = 'form-feedback ' + type;
-    if (type === 'success') setTimeout(clearFb, 5000);
-  };
-  const clearFb = () => {
-    if (!feedback) return;
-    feedback.textContent = '';
-    feedback.className = 'form-feedback';
-  };
-
-  const resetForm = () => {
-    if (form) form.reset();
-    if (editIdxInp) editIdxInp.value = '';
-    const lbl = submitBtn && (submitBtn.querySelector('.rev-btn-label') || submitBtn.querySelector('span'));
-    if (lbl) lbl.textContent = 'Publish Review';
-    if (formTitle) formTitle.textContent = 'Leave an Impression';
-    clearFb();
-  };
-
-  /* ── Form submit ────────────────────────────────────────── */
-  const setLoading = (on) => { if (submitBtn) submitBtn.disabled = on; };
-
-  const initForm = () => {
-    if (!form) return;
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = (document.getElementById('rev-name')?.value || '').trim();
-      const text = (document.getElementById('rev-text')?.value || '').trim();
-      const editingId = editIdxInp ? editIdxInp.value : '';
-
-      if (!name) { showFb('Please enter your name.', 'error'); document.getElementById('rev-name')?.focus(); return; }
-      if (!text) { showFb('Please write a review.',  'error'); document.getElementById('rev-text')?.focus(); return; }
-      if (name.length > 80)   { showFb('Please keep your name under 80 characters.', 'error'); return; }
-      if (text.length > 1500) { showFb('Please keep your review under 1500 characters.', 'error'); return; }
-
-      const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      setLoading(true);
-      try {
-        if (fbReady) {
-          /* ── Shared path (Firestore) ── */
-          if (editingId) {
-            const existing = findReview(editingId);
-            await FirebaseReviews.update(editingId, {
-              name, text, date: (existing && existing.date) || today
-            });
-          } else {
-            const newId = await FirebaseReviews.add({
-              name, text, date: today, createdAt: Date.now()
-            });
-            addMine(newId);
-          }
-          /* onSnapshot refreshes the list */
-        } else {
-          /* ── Local path (fallback) ── */
-          if (editingId) {
-            const i = reviews.findIndex(r => r.id === editingId);
-            if (i > -1) reviews[i] = { ...reviews[i], name, text, date: reviews[i].date || today };
-          } else {
-            const obj = { id: genId(), name, text, date: today, createdAt: Date.now() };
-            reviews.unshift(obj);
-            addMine(obj.id);
-          }
-          saveLocal();
-          current = 0;
-          render();
-        }
-        resetForm();
-        showFb('Your review has been published.', 'success');
-        if (typeof ToastEngine !== 'undefined') {
-          ToastEngine.show('Your review has been published successfully.', 'success', 6000);
-        }
-      } catch (err) {
-        console.warn('[ReviewEngine] submit failed:', err && err.message);
-        showFb('Could not publish your review right now. Please try again.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    });
-  };
-
   /* ── Resize ─────────────────────────────────────────────── */
   let resizeTimer;
   const onResize = () => {
@@ -949,10 +910,8 @@ const ReviewEngine = (() => {
     loadLocal();        /* instant display from local cache / store */
     render();
     bindDrag();
-    initForm();
     prevBtn && prevBtn.addEventListener('click', () => { prev(); startAuto(); });
     nextBtn && nextBtn.addEventListener('click', () => { next(); startAuto(); });
-    track   && track.addEventListener('click', onTrackClick);
     window.addEventListener('resize', onResize, { passive: true });
     startAuto();
 
@@ -965,11 +924,11 @@ const ReviewEngine = (() => {
             console.warn('[ReviewEngine] Firestore sync error — using local cache.', err && err.message);
             return; /* keep the local cache already rendered */
           }
-          reviews = (list || []).map(r => ({
-            id: r.id, name: r.name || '', role: r.role || '',
-            text: r.text || '', date: r.date || '', createdAt: r.createdAt || null
-          }));
-          saveLocal();   /* mirror to localStorage as a cache for instant next load */
+          reviews = [...SEED_REVIEWS, ...(list || []).map(r => ({
+              id: r.id, name: r.name || '', role: r.role || '',
+              text: r.text || '', date: r.date || '', createdAt: r.createdAt || null
+            }))];
+            saveLocal();   /* mirror to localStorage as a cache for instant next load */
           render();
         });
       }).catch((err) => {
