@@ -230,9 +230,23 @@ const GalleryEngine = (() => {
       caption: 'Wisdom, sacrifice, and unconditional love across generations.',
       desc: 'A portrait honouring the quiet strength of a grandmother whose love laid the foundation for everything that followed.'
     },
-    // 19. YouTube Shorts video — final gallery item
+    // 19. YouTube Shorts video — featured gallery item
     {
       video: 'https://www.youtube.com/embed/zQgge5NFaI8',
+      title: 'Featured Video',
+      caption: 'The Five Rupees Dreams — a short video journey.',
+      desc: 'A YouTube Shorts feature capturing the spirit of The Five Rupees Dreams.'
+    },
+    // 20. YouTube Shorts video — gallery item
+    {
+      video: 'https://www.youtube.com/embed/TOqMrnXaT18',
+      title: 'Featured Video',
+      caption: 'The Five Rupees Dreams — a short video journey.',
+      desc: 'A YouTube Shorts feature capturing the spirit of The Five Rupees Dreams.'
+    },
+    // 21. YouTube Shorts video — final gallery item
+    {
+      video: 'https://www.youtube.com/embed/NpJjxhgs5lg',
       title: 'Featured Video',
       caption: 'The Five Rupees Dreams — a short video journey.',
       desc: 'A YouTube Shorts feature capturing the spirit of The Five Rupees Dreams.'
@@ -332,12 +346,26 @@ const GalleryEngine = (() => {
   const next = () => goTo(current + 1);
   const prev = () => goTo(current - 1);
 
+  /* true when the active gallery item is the YouTube video slide */
+  const isVideoSlide = (i) => !!(ITEMS[i] && ITEMS[i].video);
+
   const startAuto = () => {
     clearInterval(autoTimer);
-    autoTimer = setInterval(next, 5500);
+    autoTimer = null;
+    /* Never auto-advance while the video is the active slide. */
+    if (isVideoSlide(current)) return;
+    autoTimer = setInterval(() => {
+      next();
+      /* If the advance above landed on the video, cancel the timer
+         immediately so the video is never skipped after five seconds. */
+      if (isVideoSlide(current)) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+    }, 5500);
   };
 
-  const stopAuto = () => clearInterval(autoTimer);
+  const stopAuto = () => { clearInterval(autoTimer); autoTimer = null; };
 
   /* ── Premium live-drag with momentum ── */
   let dragOriginX   = 0;
